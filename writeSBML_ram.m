@@ -1,6 +1,6 @@
 function sbmlModel = writeSBML_ram(model,fileName,compSymbolList,compNameList, storageCompID, biomassCompID,externalCompID)
 
-% writeSBML exports a deFBA model structure into an SBML FBCv2 file using the ram standard
+% writeSBML_ram exports a deFBA model structure into an SBML FBCv2 file using the ram standard
 %
 %INPUTS
 % model             deFBA model structure with the fields:

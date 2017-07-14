@@ -8,7 +8,7 @@ function [id] = findRxnIDs(model,rxnsToFind)
 %               be found
 %
 %OUTPUTS
-%id           cell array of reaction IDs for the reactions in rxnsToFind list
+% id            cell array of reaction IDs for the reactions in rxnsToFind list
 %
 % Alexandra Reimers 13/07/2017
 

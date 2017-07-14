@@ -50,6 +50,7 @@ function model = readdeFBAModel(fileName,externalCompartmentID, biomassCompartme
 %   Y0                          initial values for the storage (first noStorage entries) and external metabolites (rest) amounts
 %   maintenanceID               ID of the maintenance reaction
 %   maintenanceValue            maintenance dependence on total biomass
+%   gprComp                     cell array that specifies for each reaction the recipe for building its corresponding enzyme from the individual gene ids ( e.g. 3*gene1 AND 2*gene2 means that the enzyme is made of three copies of gene1 and 2 copies of gene2)
 %
 %Alexandra Reimers 13/07/2017
 
