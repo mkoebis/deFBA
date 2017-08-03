@@ -1,4 +1,4 @@
-function model = readSBML_ram(fileName,externalCompartmentID, biomassCompartmentID, storageCompartmentID)
+function model = readSBML_ram(fileName,externalCompartmentID)
 
 % readSBML_adjusted reads in a SBML model in ram format as a deFBA matlab structure
 %
@@ -7,9 +7,6 @@ function model = readSBML_ram(fileName,externalCompartmentID, biomassCompartment
 % fileName                  File name for file to read in
 % externalCompartmentID     String containting the id of the external
 %                           metabolites compartment
-% biomassCompartmentID      String containting the id of the biomass compartment
-% storageCompartmentID      String containting the id of the storage compartment
-%
 %OUTPUT
 % model                     deFBA model structure with the fields:
 %   rxns                        cell array of all reaction IDs
@@ -55,6 +52,7 @@ function model = readSBML_ram(fileName,externalCompartmentID, biomassCompartment
 %% call the TranslateSBML function from the libSBML to get a Matlab SBML structure
 
 modelSBML = TranslateSBML(fileName); 
+xmlModel = getAnnotations(fileName);
 
 nMets = length(modelSBML.species);
 nRxns = length(modelSBML.reaction);
@@ -90,26 +88,31 @@ storage = [];
 for i = 1:nMets
     % parse metabolite id
     metID = speciesList{i};
-    idx = strfind(metID,'_');
-    if ~isempty(idx)
-        idx = idx(end);
-        metID = [metID(1:idx-1),'[',metID(idx+1:end),']'];
-    end
-    mets{i} = metID;
+%     idx = strfind(metID,'_');
+%     if ~isempty(idx)
+%         idx = idx(end);
+%         metID = [metID(1:idx-1),'[',metID(idx+1:end),']'];
+%     end
+
+    mets{i} = parseMetID(metID);
     metNames{i} = tmpSpecies(i).name;
-     
-    if strcmp(tmpSpecies(i).compartment,biomassCompartmentID)
-        if ~ismember(tmpSpecies(i).id,{modelSBML.fbc_geneProduct.fbc_id})
-            quotaMet = [quotaMet,i];
-        else
-            enzMet = [enzMet,i];
-        end
-    end
+    
     if strcmp(tmpSpecies(i).compartment,externalCompartmentID)
         Ymet = [Ymet,i];
     end
-    if strcmp(tmpSpecies(i).compartment,storageCompartmentID)
-        storage = [storage,i];
+    
+    if ~isempty(xmlModel.mets(i).annotation)
+        for j=1:length(xmlModel.mets(i).annotation)
+            if strcmp(xmlModel.mets(i).annotation(j).Name,'ram:speciesType')
+                if strcmp(xmlModel.mets(i).annotation(j).Value,'enzyme')
+                    enzMet = [enzMet,i];
+                elseif strcmp(xmlModel.mets(i).annotation(j).Value,'storage')
+                    storage = [storage,i];
+                else
+                    quotaMet = [quotaMet,i];
+                end
+            end
+        end
     end
 end
 
@@ -122,27 +125,54 @@ sizeYmet = length(storage) +length(Ymet);
 noStorage = length(storage);
 
 % get quotaInitial
-quota_tmp = tmpSpecies(quotaMet);
+quota_tmp = xmlModel.mets(quotaMet);
 quotaInitial = zeros(1,sizeQuotaMet);
 quotaWeights = zeros(1,sizeQuotaMet);
 for i=1:length(quota_tmp)
-    [mw,bp] = parseSpeciesAnnotation(quota_tmp(i),modelSBML.parameter);
-    quotaInitial(i) = bp;
-    quotaWeights(i) = mw;
+    for j=1:length(quota_tmp(i).annotation)
+        if strcmp(quota_tmp(i).annotation(j).Name,'ram:biomassPercentage')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,quota_tmp(i).annotation(j).Value)
+                    quotaInitial(i) = str2double(xmlModel.params(k).value);
+                end
+            end
+        end
+        if strcmp(quota_tmp(i).annotation(j).Name,'ram:molecularWeight')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,quota_tmp(i).annotation(j).Value)
+                    quotaWeights(i) = str2double(xmlModel.params(k).value);
+                end
+            end
+        end
+    end
 end
 
 % get proteinWeights
-prot_tmp = tmpSpecies(enzMet);
-stor_tmp = tmpSpecies(storage);
+prot_tmp = xmlModel.mets(enzMet);
+stor_tmp = xmlModel.mets(storage);
 proteinWeights = zeros(length(prot_tmp),1);
 storageWeight = zeros(length(stor_tmp),1);
 for i=1:length(prot_tmp)
-    [mw,~] = parseSpeciesAnnotation(prot_tmp(i),modelSBML.parameter);
-    proteinWeights(i) = mw;
+    for j=1:length(prot_tmp(i).annotation)
+        if strcmp(prot_tmp(i).annotation(j).Name,'ram:molecularWeight')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,prot_tmp(i).annotation(j).Value)
+                    proteinWeights(i) = str2double(xmlModel.params(k).value);
+                end
+            end
+        end
+    end
 end
 for i=1:length(stor_tmp)
-    [mw,~] = parseSpeciesAnnotation(stor_tmp(i),modelSBML.parameter);
-    storageWeight(i) = mw;
+    for j=1:length(stor_tmp(i).annotation)
+        if strcmp(stor_tmp(i).annotation(j).Name,'ram:molecularWeight')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,stor_tmp(i).annotation(j).Value)
+                    storageWeight(i) = str2double(xmlModel.params(k).value);
+                end
+            end
+        end
+    end
 end
 
 % build enzyme list and rxn-enzyme association matrix
@@ -158,10 +188,7 @@ gprComp = cell(nRxns,1);
 
 for i = 1:nRxns
     %% read EC number
-    notesField = modelSBML.reaction(i).notes;
-    if (~isempty(notesField))
-        ecNumbers{i} = extractEC(notesField);
-    end
+    ecNumbers{i} = xmlModel.rxns(i).ec;
 
     %% read the gene product association and at the same time build rxnEnzRules,enz,genes,rxnGeneMat
     if isfield(modelSBML.reaction,'fbc_geneProductAssociation')
@@ -282,11 +309,34 @@ for i = 1:nRxns
     end    
 end
 
-%% read kcat values
+%% read kcat values and maintenance
 kcat = rxnEnzRules;
 tmp_rxns = modelSBML.reaction;
 for i=1:nRxns
-   [maintenanceScale, kplus, kminus] = parseReactionAnnotation(tmp_rxns(i),modelSBML.parameter);
+    for j=1:length(xmlModel.rxns(i).annotation)
+        if strcmp(xmlModel.rxns(i).annotation(j).Name,'ram:kcatForward')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,xmlModel.rxns(i).annotation(j).Value)
+                    kplus = str2double(xmlModel.params(k).value);
+                end
+            end
+        end
+        if strcmp(xmlModel.rxns(i).annotation(j).Name,'ram:kcatBackward')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,xmlModel.rxns(i).annotation(j).Value)
+                    kminus = str2double(xmlModel.params(k).value);
+                end
+            end
+        end
+        if strcmp(xmlModel.rxns(i).annotation(j).Name,'ram:maintenanceScaling')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,xmlModel.rxns(i).annotation(j).Value)
+                    maintenanceScale = str2double(xmlModel.params(k).value);
+                end
+            end
+        end
+    end
+    
    kcat(i,logical(rxnEnzRules(i,:))) = kplus;
    
    if maintenanceScale>0 || ~isempty(strfind(tmp_rxns(i).id,'maintenance'))
@@ -398,71 +448,92 @@ function vec = columnVector(vec)
     end
 end
 
-function [mw, bp] = parseSpeciesAnnotation(speciesEntry,parameterEntries)
-    % parse annotation to get the parameter names
-    str = speciesEntry.annotation;
-    idx = regexp(str,'(\"[\w\s]+\")');% extract the indices of the two fields
-    mw_str = str(idx(1)+1:idx(2)-1);
-    bp_str = str(idx(2)+1:end);
+function xmlModel = getAnnotations(filename)
+    xmlModel = parseXML(filename);
+    xmlModel = xmlModel.Children(2);
+    xmlModel.mets = xmlModel.Children(8).Children(2:2:end);
+    xmlModel.rxns = xmlModel.Children(12).Children(2:2:end);
+    xmlModel.params = xmlModel.Children(10).Children(2:2:end);
+    xmlModel.geneProd = xmlModel.Children(14).Children(2:2:end);
     
-    idx = strfind(mw_str,'"');
-    mw_str = mw_str(1:idx-1);
-    idx = strfind(bp_str,'"');
-    bp_str = bp_str(1:idx-1);
-    
-    % extract parameter values
-    [~,idx] = ismember(mw_str,{parameterEntries.id});
-    mw = parameterEntries(idx).value;
-    [~,idx] = ismember(bp_str,{parameterEntries.id});
-    bp = parameterEntries(idx).value;
-end
-
-function [maintenanceScale,kplus, kminus] = parseReactionAnnotation(rxnEntry,parameterEntries)
-    % parse annotation to get the parameter names
-    str = rxnEntry.annotation;
-    idx = regexp(str,'(\"[\w\s]+\")');% extract the indices of the two fields
-    
-    m_str = str(idx(1)+1:idx(2)-1);    
-    k1_str = str(idx(2)+1:idx(3)-1);
-    k2_str = str(idx(3)+1:end);
-    
-    idx = strfind(m_str,'"');
-    m_str = m_str(1:idx-1);
-    idx = strfind(k1_str,'"');
-    k1_str = k1_str(1:idx-1);
-    idx = strfind(k2_str,'"');
-    k2_str = k2_str(1:idx-1);
-    
-     % extract parameter values
-    [~,idx] = ismember(m_str,{parameterEntries.id});
-    maintenanceScale = parameterEntries(idx).value;
-    [~,idx] = ismember(k1_str,{parameterEntries.id});
-    kplus = parameterEntries(idx).value;
-    [~,idx] = ismember(k2_str,{parameterEntries.id});
-    kminus = parameterEntries(idx).value;
-end
-
-function [ecNumber] = extractEC(notesField)
-    %parseSBMLNotesField Parse the notes field of an SBML file to extract
-    %the EC number
-    %
-    % [ecNumber] = extractEC(notesField)
-
-    if isempty(regexp(notesField,'html:p', 'once'))
-        tag = 'p';
-    else
-        tag = 'html:p';
-    end
-
-    ecNumber = '';
-
-    [~,fieldList] = regexp(notesField,['<' tag '>.*?</' tag '>'],'tokens','match');
-
-    for i = 1:length(fieldList)
-        fieldTmp = regexp(fieldList{i},['<' tag '>(.*)</' tag '>'],'tokens');
-        fieldStr = fieldTmp{1}{1};
-        if (regexp(fieldStr,'EC Number'))
-            ecNumber = regexprep(strrep(fieldStr,'EC Number:',''),'^(\s)+','');
+    for i=1:length(xmlModel.mets)
+        for j=1:length(xmlModel.mets(i).Attributes)
+            if strcmp(xmlModel.mets(i).Attributes(j).Name,'id')
+                xmlModel.mets(i).id = xmlModel.mets(i).Attributes(j).Value;
+            end
+        end
+        if ~isempty(xmlModel.mets(i).Children)
+            xmlModel.mets(i).annotation = xmlModel.mets(i).Children(2).Children(2).Children(2).Attributes;
         end
     end
+    xmlModel.mets = rmfield(xmlModel.mets,'Name');
+    xmlModel.mets = rmfield(xmlModel.mets,'Data');
+    xmlModel.mets = rmfield(xmlModel.mets,'Children');
+    
+    for i=1:length(xmlModel.params)
+        for j=1:length(xmlModel.params(i).Attributes)
+            if strcmp(xmlModel.params(i).Attributes(j).Name,'id')
+                xmlModel.params(i).id = xmlModel.params(i).Attributes(j).Value;
+            end
+            if strcmp(xmlModel.params(i).Attributes(j).Name,'value')
+                xmlModel.params(i).value = xmlModel.params(i).Attributes(j).Value;
+            end
+        end
+    end
+    xmlModel.params = rmfield(xmlModel.params,'Name');
+    xmlModel.params = rmfield(xmlModel.params,'Data');
+    xmlModel.params = rmfield(xmlModel.params,'Children');
+    
+    for i=1:length(xmlModel.rxns)
+        for j=1:length(xmlModel.rxns(i).Attributes)
+            if strcmp(xmlModel.rxns(i).Attributes(j).Name,'id')
+                xmlModel.rxns(i).id = xmlModel.rxns(i).Attributes(j).Value;
+            end
+        end
+        for j=1:length(xmlModel.rxns(i).Children)
+            if strcmp(xmlModel.rxns(i).Children(j).Name,'annotation')
+                xmlModel.rxns(i).annotation = xmlModel.rxns(i).Children(j).Children(2).Children(2).Attributes;
+            end
+            if strcmp(xmlModel.rxns(i).Children(j).Name,'notes')
+                ec = xmlModel.rxns(i).Children(j).Children(2).Children(2).Children.Data;
+                xmlModel.rxns(i).ec = regexprep(strrep(ec,'EC Number:',''),'^(\s)+','');
+            end
+        end
+        
+        xmlModel.rxns(i).Children = xmlModel.rxns(i).Children(2:2:end);
+    end
+    xmlModel.rxns = rmfield(xmlModel.rxns,'Name');
+    xmlModel.rxns = rmfield(xmlModel.rxns,'Data');
+    xmlModel.rxns = rmfield(xmlModel.rxns,'Children');
+end
+
+function [idsMet] = parseMetID(id)
+    idsMet = '';
+    [~,aux] = regexp(id,'(?<met>.+)_(?<comp3>.+)_(?<comp2>.+)_(?<comp1>.+)','tokens','names');
+     
+    if isempty(aux)
+       [~,aux] = regexp(id,'(?<met>.+)_(?<comp2>.+)_(?<comp1>.+)','tokens','names');
+    else
+        if isnan(str2double(aux.comp3))&&isnan(str2double(aux.comp2))
+            idsMet = [aux.met,'_[',aux.comp3,']_[',aux.comp2,']_[',aux.comp1,']'];
+        elseif ~isnan(str2double(aux.comp3))&&isnan(str2double(aux.comp2))
+            idsMet = [aux.met,'_',aux.comp3,'_[',aux.comp2,']_[',aux.comp1,']'];
+        end
+    end
+    
+    if isempty(aux)
+        [~,aux] = regexp(id,'(?<met>.+)_(?<comp1>.+)','tokens','names');
+    else
+        if isempty(idsMet)
+            if isnan(str2double(aux.comp2))
+                idsMet = [aux.met,'_[',aux.comp2,']_[',aux.comp1,']'];
+            else
+                idsMet = [aux.met,'_',aux.comp2,'_[',aux.comp1,']'];
+            end
+        end
+    end   
+    
+    if isempty(idsMet)
+        idsMet = [aux.met,'_[',aux.comp1,']'];
+    end    
 end

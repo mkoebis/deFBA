@@ -1,4 +1,4 @@
-function sbmlModel = writeSBML_ram(model,fileName,compSymbolList,compNameList, storageCompID, biomassCompID,externalCompID)
+function sbmlModel = writeSBML_ram(model,fileName,compSymbolList,compNameList,externalCompID)
 
 % writeSBML_ram exports a deFBA model structure into an SBML FBCv2 file using the ram standard
 %
@@ -39,18 +39,16 @@ function sbmlModel = writeSBML_ram(model,fileName,compSymbolList,compNameList, s
 %   Y0                          initial values for the storage (first noStorage entries) and external metabolites (rest) amounts
 %   maintenanceID               ID of the maintenance reaction
 %   maintenanceValue            maintenance dependence on total biomass
-%   gprComp                     cell array that specifies for each reaction the recipe for building its corresponding enzyme from the individual gene ids ( e.g. 3*gene1 AND 2*gene2 means that the enzyme is made of three copies of gene1 and 2 copies of gene2)
+%   gprComp                     cell array that specifies for each reaction the recipe for building its corresponding enzyme from the individual gene idsMet ( e.g. 3*gene1 AND 2*gene2 means that the enzyme is made of three copies of gene1 and 2 copies of gene2)
 % fileName          File name for output file
-% compSymbolList    List of compartment ids
+% compSymbolList    List of compartment idsMet
 % compNameList      List of compartment names corresponding to compSymbolList
-% externalCompID    String containing the ID of the extracellular metabolites compartment in the SBML file
-% biomassCompID     String containing the ID of the biomass components compartment in the SBML file
-% storageCompID     String containing the ID of the storage components compartment in the SBML file
+% externalCompID    ID of the external compartment
 %
 %OUTPUT
 % sbmlModel         SBML MATLAB structure
 %
-% Alexandra Reimers 13/07/2017
+% Alexandra Reimers 02/08/2017
 
 %% define empty structs for sbml
 sbmlModel = initSBML(model);
@@ -181,19 +179,6 @@ tmp_unitDefinition=struct('typecode','SBML_UNIT_DEFINITION',...
         'localParameter',cell(1,0),...
         'level',3,...
         'version',1);
-    tmp_fbc_fluxBound=struct('typecode','SBML_FBC_FLUXBOUND',...
-        'metaid','',...
-        'notes','',...
-        'annotation','',...
-        'sboTerm',-1,...
-        'fbc_id','',...
-        'fbc_reaction','',... 
-        'fbc_operation','',...
-        'fbc_value','',...    
-        'isSetfbc_value','',...
-        'level',3,...
-        'version',1,...
-        'fbc_version',2);
     tmp_Rxn.fbc_geneProductAssociation=struct('typecode','SBML_FBC_GENE_PRODUCT_ASSOCIATION',...
         'metaid','',...
         'notes','',...
@@ -230,10 +215,12 @@ tmp_unitDefinition=struct('typecode','SBML_UNIT_DEFINITION',...
 %% units
 reaction_units = 'mmol_per_hr';
 tmp_unitDefinition.id =  reaction_units;
+
 unit_kinds = {'mole','gram','second'};
 unit_exponents = [1 -1 -1];
 unit_scales = [-3 0 0];
 unit_multipliers = [1 1 1*60*60];
+
 sbmlModel.unitDefinition=tmp_unitDefinition;
 
 for i = 1:size(unit_kinds, 2)
@@ -249,9 +236,14 @@ for i = 1:size(unit_kinds, 2)
 end
 
 %% species
-tmp_metCompartment = {};
+% parse metabolites and compartments
+tmp_metCompartment = cell(length(model.mets),1);
+comps = cell(length(model.mets),1);
+idsMet = cell(length(model.mets),1);
 
-[~, tmp_met_struct] = regexp(model.mets,'(?<met>.+)\[(?<comp>.+)\]|(?<met>.+)\((?<comp>.+)\)','tokens','names');
+for i=length(model.mets):-1:1
+    [idsMet{i},comps{i},tmp_metCompartment{i}] = parseMetID(model.mets{i});
+end
 
 sbmlModel.species=tmp_species;
 
@@ -260,32 +252,33 @@ tmp_parameter.id = 'zero';
 tmp_parameter.value = 0;
 sbmlModel.parameter = tmp_parameter;
 
+t = 1;
+b = 1;
+c = 1;
+
 %% metabolites
 for i=1:length(model.mets)
     tmp_note='';
-    if  ~isempty(tmp_met_struct{1})
-        tmp_met = tmp_met_struct{i}.met;
-    else
-        tmp_met = model.mets{i};
-    end
     
-    if isempty(tmp_met_struct{1})
-        %Change id to correspond to SBML id specifications
-        tmp_met = strcat((tmp_met), '_', '[c]');
-    else
-        tmp_met = strcat((tmp_met), '_', tmp_met_struct{i}.comp);
-    end
-    
-    tmp_species.id = formatID(tmp_met);
+    tmp_species.id = [idsMet{i},'_',tmp_metCompartment{i}];
     tmp_species.name = model.metNames{i};
-    tmp_species.compartment = formatID(tmp_met_struct{i}.comp);
-    tmp_metCompartment{i} = formatID(tmp_met_struct{i}.comp); 
+    tmp_species.compartment = tmp_metCompartment{i};
 
+    % take care of nonlimiting extracellular metabolites
+    if strcmp(tmp_species.compartment,externalCompID)
+        tmp_species.initialAmount = 0;
+        tmp_species.constant = 1;
+        tmp_species.boundaryCondition = 1;
+    else
+        tmp_species.initialAmount = 0;
+        tmp_species.constant = 0;
+        tmp_species.boundaryCondition = 0;
+    end
 
 %% annotations for metabolites
- tmp_noteBegin = sprintf('<annotation>\n<ram:RAM xmlns:ram="http://fancy.web.page">\n<ram:species');
-    if strcmp(tmp_metCompartment{i},biomassCompID)        
-        if ~isempty(strfind(tmp_species.name,'quota'))
+ tmp_noteBegin = sprintf('<annotation>\n<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n<ram:species');
+    if i > model.sizeXmet+model.sizeYmet        
+        if i <= model.sizeXmet+model.sizeYmet+model.sizeQuotaMet
             [~,idxQ] = ismember(tmp_species.name,model.metNames(model.sizeXmet+model.sizeYmet+1:model.sizeXmet+model.sizeYmet+model.sizeQuotaMet));
             tmp_percBiomass = model.quotaInitial(idxQ);
             tmp_parameter.id = sprintf('bioPercentage_%d',idxQ);
@@ -297,46 +290,59 @@ for i=1:length(model.mets)
             idW = tmp_parameter.id;
             tmp_parameter.value = tmp_molWeight;
             sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
-            tmp_note=sprintf('%s ram:molecularWeight="%s" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,idW,idP);
+            tmp_note=sprintf('%s ram:speciesType="quota" ram:molecularWeight="%s" ram:objectiveWeight="zero" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,idW,idP);
+            tmp_species.initialAmount = model.initialBiomass(b);
+            b = b+1;
         else
             [~,idxP] = ismember(tmp_species.name,model.metNames(model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+1:model.sizeXmet+model.sizeYmet+model.sizePmet));
             tmp_molWeight = model.proteinWeights(idxP);
             tmp_parameter.id = sprintf('weight_%d',idxP);
             tmp_parameter.value = tmp_molWeight;
             sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
-            tmp_note=sprintf('%s ram:molecularWeight="%s" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id);
+            tmp_note=sprintf('%s ram:speciesType="enzyme" ram:molecularWeight="%s" ram:objectiveWeight="%s" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id,tmp_parameter.id);
+            tmp_species.initialAmount = model.initialBiomass(b);
+            b = b+1;
         end
     end
 
-    if strcmp(tmp_metCompartment{i},storageCompID)
-        [~,idxY] = ismember(tmp_species.name,model.metNames(model.sizeXmet+1:model.sizeXmet+model.sizeYmet));
-        tmp_molWeight = model.storageWeight(idxY);
-        tmp_parameter.id = sprintf('weight_st_%d',idxY);
-        tmp_parameter.value = tmp_molWeight;
-        sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
-        tmp_note=sprintf('%s ram:molecularWeight="%s" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id);
+    if i > model.sizeXmet && i <= model.sizeXmet+model.sizeYmet
+        if ~ismember(tmp_species.id,model.carbonSources)
+            [~,idxY] = ismember(tmp_species.name,model.metNames(model.sizeXmet+1:model.sizeXmet+model.sizeYmet));
+            tmp_molWeight = model.storageWeight(idxY);
+            tmp_parameter.id = sprintf('weight_st_%d',idxY);
+            tmp_parameter.value = tmp_molWeight;
+            sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
+            tmp_note=sprintf('%s ram:speciesType="storage"  ram:molecularWeight="%s" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id);
+            tmp_species.initialAmount = model.Y0(t);
+            tmp_species.constant = 0;
+            t = t+1;
+        else
+            tmp_species.initialAmount = model.Y0(length(model.storageWeight)+c);
+            tmp_species.constant = 0;
+            tmp_species.boundaryCondition = 1;
+            c = c+1;
+        end
     end
     
     tmp_species.annotation = tmp_note;
-    
+      
     if i==1
         sbmlModel.species=tmp_species;
     else
         sbmlModel.species=[sbmlModel.species, tmp_species];
     end
-    
 end
 
 %% compartments.
 
 tmp_metCompartment = unique(tmp_metCompartment);
 
-for i=1:size(tmp_metCompartment,2)
+for i=1:length(tmp_metCompartment)
     if ~isempty(tmp_metCompartment) % in the case of an empty model
-        tmp_id = tmp_metCompartment{1,i};
+        tmp_id = tmp_metCompartment{i};
         tmp_name = compNameList{find(strcmp(formatID(compSymbolList),tmp_id))};  
         
-        tmp_compartment.id = formatID(tmp_id);
+        tmp_compartment.id = tmp_id;
         tmp_compartment.name = tmp_name;
     end
     
@@ -373,18 +379,10 @@ if isfield(model,'gprComp')
                     aux = sprintf('%s %s',aux,model.rxns{rIdx(j)});
                 end
             end     
-            aux = sprintf('%s[bio]',aux);
             sbmlModel.species(idx).name = aux;
-            % find metabolites involved
-            [mIdx,~] = find(model.S(:,rIdx));
-            %get their compartments
-            comps = unique({sbmlModel.species(mIdx).compartment});
-            sbmlModel.species(idx).id = model.genes{gIdx};
-            % add the compartments to the name
-            for j=1:length(comps)
-                sbmlModel.species(idx).id = [sbmlModel.species(idx).id,'_',comps{j}];
-            end
-            sbmlModel.species(idx).id = [sbmlModel.species(idx).id,'_bio'];            
+            
+            sbmlModel.species(idx).id = [model.genes{gIdx},'_',comps{idx}];
+      
             geneProductRxn{i} = sbmlModel.species(idx).id;
         elseif length(gIdx)>1
             if isempty(strfind(sbmlModel.species(idx).id,'complex'))
@@ -396,21 +394,13 @@ if isfield(model,'gprComp')
                         aux = sprintf('%s %s',aux,model.rxns{rIdx(j)});
                     end
                 end     
-                aux = sprintf('%s[bio]',aux);
-                sbmlModel.species(idx).name = aux;
-                
-                 % find metabolites involved
-                [mIdx,~] = find(model.S(:,rIdx));
-                %get their compartments
-                comps = unique({sbmlModel.species(mIdx).compartment});
+
+                sbmlModel.species(idx).name = aux;                
+
                 sbmlModel.species(idx).id = sprintf('complex_%d',t);
                 t = t+1;
-                % add the compartments to the name
-                for j=1:length(comps)
-                    sbmlModel.species(idx).id = [sbmlModel.species(idx).id,'_',comps{j}];
-                end
-                sbmlModel.species(idx).id = [sbmlModel.species(idx).id,'_bio'];
                 
+                sbmlModel.species(idx).id = [sbmlModel.species(idx).id,'_',comps{idx}];            
                 geneProductRxn{i} = sbmlModel.species(idx).id;
             else
                 geneProductRxn{i} = sbmlModel.species(idx).id;
@@ -420,32 +410,8 @@ if isfield(model,'gprComp')
     end
 end
 
-% set initial amounts for metabolites allowed to accumulate and biomass
-t = 1;
-b = 1;
-c = 1;
-for i=1:length(sbmlModel.species)
-   
-    if strcmp(sbmlModel.species(i).compartment,storageCompID)
-        sbmlModel.species(i).initialAmount = model.Y0(t);
-        sbmlModel.species(i).constant = 0;
-        t = t+1;
-    elseif strcmp(sbmlModel.species(i).compartment,externalCompID)
-        if ~ismember(sbmlModel.species(i).id,model.carbonSources)
-            sbmlModel.species(i).initialAmount = 0;
-            sbmlModel.species(i).constant = 1;
-            sbmlModel.species(i).boundaryCondition = 1;
-        else
-            sbmlModel.species(i).initialAmount = model.Y0(length(model.storageWeight)+c);
-            sbmlModel.species(i).constant = 0;
-            sbmlModel.species(i).boundaryCondition = 1;
-            c = c+1;
-        end
-    elseif strcmp(sbmlModel.species(i).compartment,biomassCompID)
-        sbmlModel.species(i).initialAmount = model.initialBiomass(b);
-        b = b+1;
-    end
-end
+
+
 
 gprIdx = true(length(geneProductRxn),1);
 for i=1:length(geneProductRxn)
@@ -463,18 +429,20 @@ gprComp = gprComp(idxUnique);
 doubles = gprComp(setdiff(1:1:length(gprComp),u));
 countDummy=1;
 for i=1:length(geneProductRxn)
-    tmp_fbc_geneProduct.fbc_id=formatID(geneProductRxn{i}); % generate fbc_id values
-    if ismember(gprComp{i},doubles)
-        tmp_fbc_geneProduct.fbc_label=sprintf('%s_%d',gprComp{i},countDummy);
-        countDummy = countDummy+1;
-    else
-        tmp_fbc_geneProduct.fbc_label=gprComp{i};
-    end
-    tmp_fbc_geneProduct.fbc_associatedSpecies = formatID(geneProductRxn{i});
-    if i==1
-        sbmlModel.fbc_geneProduct=tmp_fbc_geneProduct;
-    else
-        sbmlModel.fbc_geneProduct=[sbmlModel.fbc_geneProduct,tmp_fbc_geneProduct];
+    if ~strcmp(geneProductRxn{i},'')
+        tmp_fbc_geneProduct.fbc_id=formatID(geneProductRxn{i}); % generate fbc_id values
+        if ismember(gprComp{i},doubles)
+            tmp_fbc_geneProduct.fbc_label=sprintf('%s_%d',gprComp{i},countDummy);
+            countDummy = countDummy+1;
+        else
+            tmp_fbc_geneProduct.fbc_label=gprComp{i};
+        end
+        tmp_fbc_geneProduct.fbc_associatedSpecies = formatID(geneProductRxn{i});
+        if i==1
+            sbmlModel.fbc_geneProduct=tmp_fbc_geneProduct;
+        else
+            sbmlModel.fbc_geneProduct=[sbmlModel.fbc_geneProduct,tmp_fbc_geneProduct];
+        end
     end
 end
 
@@ -503,7 +471,7 @@ for i=1:size(model.rxns, 1)
     tmp_rxnRev= model.rev(i);    
     kcat = model.Kcat_f(i,(model.Kcat_f(i,:)~=0));
     isMaintenance = strcmp(model.rxns{i},model.maintenanceID);
-    tmp_note = sprintf('<annotation>\n<ram:RAM xmlns:ram="http://fancy.web.page">\n<ram:reaction');
+    tmp_note = sprintf('<annotation>\n<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n<ram:reaction');
     if isMaintenance
         tmp_note = sprintf('%s ram:maintenanceScaling="maintenancePercentage" ram:kcatForward="zero" ram:kcatBackward="zero"/>\n</ram:RAM>\n</annotation>',tmp_note);
     else
@@ -552,10 +520,13 @@ for i=1:size(model.rxns, 1)
         end
     end
     %% grRules
-        if ~isempty(geneProductRxnOrig{i})
-            t.fbc_geneProductAssociation.fbc_id=sprintf('ga_%d',i);
-            t.fbc_geneProductAssociation.fbc_association.fbc_association=formatID(geneProductRxnOrig{i});
-        end
+    if ~isempty(geneProductRxnOrig{i})&&~strcmp(geneProductRxnOrig{i},'')
+        t.fbc_geneProductAssociation.fbc_id=sprintf('ga_%d',i);
+        t.fbc_geneProductAssociation.fbc_association.fbc_association=formatID(geneProductRxnOrig{i});
+    else
+        t.fbc_geneProductAssociation='';
+    end
+    
    
     if i==1;
         sbmlModel.reaction=t;
@@ -679,7 +650,46 @@ function sbmlModel = initSBML(model)
     end
 end
 
-%% format ids SBML
+%% parse metabolite id
+function [idsMet,comps,tmp_metCompartment] = parseMetID(id)
+    comps = '';
+    [~,aux] = regexp(id,'(?<met>.+)_\[(?<comp3>.+)\]_\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
+     
+    if isempty(aux)
+       [~,aux] = regexp(id,'(?<met>.+)_\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
+    else
+        comps = strjoin({aux.comp3,'_',aux.comp2,'_',aux.comp1},'');
+        idsMet = aux.met;
+        tmp_metCompartment = formatID(aux.comp3);
+    end
+    
+    if isempty(aux)
+        [~,aux] = regexp(id,'(?<met>.+)_\[(?<comp1>.+)\]','tokens','names');
+    else
+        if isempty(comps)
+            comps = strjoin({aux.comp2,'_',aux.comp1},'');
+            idsMet = aux.met;
+            tmp_metCompartment = formatID(aux.comp2);
+        end
+    end   
+    
+    if isempty(aux)
+        [~,aux] = regexp(id,'(?<met>.+)\[(?<comp1>.+)\]','tokens','names');
+    else
+        if isempty(comps)
+            comps = aux.comp1;
+            idsMet = aux.met;
+            tmp_metCompartment = formatID(aux.comp1);
+        end
+    end   
+    
+    if isempty(comps)
+        comps = aux.comp1;
+        idsMet = aux.met;
+        tmp_metCompartment = formatID(aux.comp1);
+    end    
+end
+%% format idsMet SBML
 function str = formatID(str)
 str = strrep(str,'-','_DASH_');
 str = strrep(str,'/','_FSLASH_');

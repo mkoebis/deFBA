@@ -1,4 +1,4 @@
-function outmodel = writedeFBAModel(model,fileName,compSymbolList,compNameList, storageCompID, biomassCompID,externalCompID)
+function outmodel = writedeFBAModel(model,fileName,compSymbolList,compNameList,externalCompID)
 %writedeFBAModel Write a deFBA model to SBML using the ram standard
 %
 %INPUTS
@@ -42,16 +42,14 @@ function outmodel = writedeFBAModel(model,fileName,compSymbolList,compNameList, 
 % fileName          File name for output file
 % compSymbolList    List of compartment ids
 % compNameList      List of compartment names corresponding to compSymbolList
-% externalCompID    String containing the ID of the extracellular metabolites compartment in the SBML file
-% biomassCompID     String containing the ID of the biomass components compartment in the SBML file
-% storageCompID     String containing the ID of the storage components compartment in the SBML file
+% externalCompID    ID of the external compartment
 %
 % OPTIONAL OUTPUTS
 % outmodel          The sbml structure.
 % 
-% Alexandra Reimers 13/07/2017
+% Alexandra Reimers 02/08/2017
 
-    outmodel = writeSBML_ram(model,fileName,compSymbolList,compNameList, storageCompID, biomassCompID,externalCompID);
+    outmodel = writeSBML_ram(model,fileName,compSymbolList,compNameList,externalCompID);
     
     % remove double gene products (libsbml bug)
     fid1 = fopen(fileName,'r'); 
