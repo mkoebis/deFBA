@@ -260,7 +260,7 @@ c = 1;
 for i=1:length(model.mets)
     tmp_note='';
     
-    tmp_species.id = [idsMet{i},'_',tmp_metCompartment{i}];
+    tmp_species.id = [idsMet{i},'_',comps{i}];
     tmp_species.name = model.metNames{i};
     tmp_species.compartment = tmp_metCompartment{i};
 
@@ -293,6 +293,9 @@ for i=1:length(model.mets)
             tmp_note=sprintf('%s ram:speciesType="quota" ram:molecularWeight="%s" ram:objectiveWeight="zero" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,idW,idP);
             tmp_species.initialAmount = model.initialBiomass(b);
             b = b+1;
+            
+            tmp_species.constant = 0;
+            tmp_species.boundaryCondition = 0;
         else
             [~,idxP] = ismember(tmp_species.name,model.metNames(model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+1:model.sizeXmet+model.sizeYmet+model.sizePmet));
             tmp_molWeight = model.proteinWeights(idxP);
@@ -302,6 +305,9 @@ for i=1:length(model.mets)
             tmp_note=sprintf('%s ram:speciesType="enzyme" ram:molecularWeight="%s" ram:objectiveWeight="%s" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id,tmp_parameter.id);
             tmp_species.initialAmount = model.initialBiomass(b);
             b = b+1;
+            
+            tmp_species.constant = 0;
+            tmp_species.boundaryCondition = 0;
         end
     end
 
@@ -653,21 +659,21 @@ end
 %% parse metabolite id
 function [idsMet,comps,tmp_metCompartment] = parseMetID(id)
     comps = '';
-    [~,aux] = regexp(id,'(?<met>.+)_\[(?<comp3>.+)\]_\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
+    [~,aux] = regexp(id,'(?<met>.+)\[(?<comp3>.+)\]_\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
      
     if isempty(aux)
-       [~,aux] = regexp(id,'(?<met>.+)_\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
+       [~,aux] = regexp(id,'(?<met>.+)\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
     else
-        comps = strjoin({aux.comp3,'_',aux.comp2,'_',aux.comp1},'');
+        comps = [aux.comp3,'_',aux.comp2,'_',aux.comp1];
         idsMet = aux.met;
         tmp_metCompartment = formatID(aux.comp3);
     end
     
     if isempty(aux)
-        [~,aux] = regexp(id,'(?<met>.+)_\[(?<comp1>.+)\]','tokens','names');
+        [~,aux] = regexp(id,'(?<met>.+)\[(?<comp1>.+)\]','tokens','names');
     else
         if isempty(comps)
-            comps = strjoin({aux.comp2,'_',aux.comp1},'');
+            comps = [aux.comp2,'_',aux.comp1];
             idsMet = aux.met;
             tmp_metCompartment = formatID(aux.comp2);
         end

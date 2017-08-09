@@ -65,7 +65,7 @@ for i = 1:nMets
     % ignore boundary metabolites that are constant
     if (~(modelSBML.species(i).boundaryCondition && modelSBML.species(i).constant))
         tmpSpecies = [tmpSpecies  modelSBML.species(i)];
-        speciesList{end+1} = modelSBML.species(i).id;         
+        speciesList{end+1} = modelSBML.species(i).id;  
     end
 end
 
@@ -79,6 +79,7 @@ rxns = cell(nRxns,1);
 
 %% build metabolite list and get sizes
 mets = cell(nMets,1);
+cmps = cell(nMets,1);
 metNames = cell(nMets,1);
 Ymet = [];
 quotaMet = [];
@@ -94,11 +95,13 @@ for i = 1:nMets
 %         metID = [metID(1:idx-1),'[',metID(idx+1:end),']'];
 %     end
 
-    mets{i} = parseMetID(metID);
+    [mets{i},cmps{i}] = parseMetID(formatID(metID));
     metNames{i} = tmpSpecies(i).name;
     
     if strcmp(tmpSpecies(i).compartment,externalCompartmentID)
-        Ymet = [Ymet,i];
+        if (tmpSpecies(i).boundaryCondition==1)
+            Ymet = [Ymet,i];
+        end
     end
     
     if ~isempty(xmlModel.mets(i).annotation)
@@ -108,7 +111,7 @@ for i = 1:nMets
                     enzMet = [enzMet,i];
                 elseif strcmp(xmlModel.mets(i).annotation(j).Value,'storage')
                     storage = [storage,i];
-                else
+                elseif strcmp(xmlModel.mets(i).annotation(j).Value,'quota')
                     quotaMet = [quotaMet,i];
                 end
             end
@@ -288,7 +291,7 @@ for i = 1:nRxns
     
     rev(i) = modelSBML.reaction(i).reversible;
     rxnNames{i} = modelSBML.reaction(i).name;
-    rxns{i} = modelSBML.reaction(i).id;
+    rxns{i} = formatID(modelSBML.reaction(i).id);
     
     % Construct S-matrix
     reactantStruct = modelSBML.reaction(i).reactant;
@@ -347,12 +350,15 @@ end
 
 %% correct enzyme names
 for i=1:length(enz)
+    i
+    i+sizeXmet+sizeYmet+sizeQuotaMet
+
     idx = find(rxnEnzRules(:,i));
     str = 'E';
     for k=1:length(idx)
         str = [str,'_',rxns{idx(k)}];
     end
-    str = [str,'[bio]'];
+    str = [str,cmps{i+sizeXmet+sizeYmet+sizeQuotaMet}];
     
     enz{i} = str;
     mets{i+sizeXmet+sizeYmet+sizeQuotaMet} = str;
@@ -455,50 +461,53 @@ function xmlModel = getAnnotations(filename)
     xmlModel.rxns = xmlModel.Children(12).Children(2:2:end);
     xmlModel.params = xmlModel.Children(10).Children(2:2:end);
     xmlModel.geneProd = xmlModel.Children(14).Children(2:2:end);
-    
+    extmets = [];
     for i=1:length(xmlModel.mets)
-        for j=1:length(xmlModel.mets(i).Attributes)
-            if strcmp(xmlModel.mets(i).Attributes(j).Name,'id')
-                xmlModel.mets(i).id = xmlModel.mets(i).Attributes(j).Value;
+        atts = {xmlModel.mets(i).Attributes.Name};
+        [~,idx] = ismember('id',atts);
+        xmlModel.mets(i).id = xmlModel.mets(i).Attributes(idx).Value;
+        
+        [~,idx] = ismember('boundaryCondition',atts);
+        if strcmp(xmlModel.mets(i).Attributes(idx).Value,'true')
+            [~,idx] = ismember('constant',atts);
+            if strcmp(xmlModel.mets(i).Attributes(idx).Value,'true')
+                extmets = [extmets,i];
             end
         end
+        
         if ~isempty(xmlModel.mets(i).Children)
             xmlModel.mets(i).annotation = xmlModel.mets(i).Children(2).Children(2).Children(2).Attributes;
         end
     end
+    xmlModel.mets = xmlModel.mets(setdiff(1:1:length(xmlModel.mets),extmets));
     xmlModel.mets = rmfield(xmlModel.mets,'Name');
     xmlModel.mets = rmfield(xmlModel.mets,'Data');
     xmlModel.mets = rmfield(xmlModel.mets,'Children');
     
-    for i=1:length(xmlModel.params)
-        for j=1:length(xmlModel.params(i).Attributes)
-            if strcmp(xmlModel.params(i).Attributes(j).Name,'id')
-                xmlModel.params(i).id = xmlModel.params(i).Attributes(j).Value;
-            end
-            if strcmp(xmlModel.params(i).Attributes(j).Name,'value')
-                xmlModel.params(i).value = xmlModel.params(i).Attributes(j).Value;
-            end
-        end
+    for i=1:length(xmlModel.params)        
+        atts = {xmlModel.params(i).Attributes.Name};
+        [~,idx] = ismember('id',atts);
+        xmlModel.params(i).id = xmlModel.params(i).Attributes(idx).Value;
+
+        [~,idx] = ismember('value',atts);
+        xmlModel.params(i).value = xmlModel.params(i).Attributes(idx).Value;
     end
     xmlModel.params = rmfield(xmlModel.params,'Name');
     xmlModel.params = rmfield(xmlModel.params,'Data');
     xmlModel.params = rmfield(xmlModel.params,'Children');
     
     for i=1:length(xmlModel.rxns)
-        for j=1:length(xmlModel.rxns(i).Attributes)
-            if strcmp(xmlModel.rxns(i).Attributes(j).Name,'id')
-                xmlModel.rxns(i).id = xmlModel.rxns(i).Attributes(j).Value;
-            end
-        end
-        for j=1:length(xmlModel.rxns(i).Children)
-            if strcmp(xmlModel.rxns(i).Children(j).Name,'annotation')
-                xmlModel.rxns(i).annotation = xmlModel.rxns(i).Children(j).Children(2).Children(2).Attributes;
-            end
-            if strcmp(xmlModel.rxns(i).Children(j).Name,'notes')
-                ec = xmlModel.rxns(i).Children(j).Children(2).Children(2).Children.Data;
-                xmlModel.rxns(i).ec = regexprep(strrep(ec,'EC Number:',''),'^(\s)+','');
-            end
-        end
+        atts = {xmlModel.rxns(i).Attributes.Name};
+        [~,idx] = ismember('id',atts);
+        xmlModel.rxns(i).id = xmlModel.rxns(i).Attributes(idx).Value;
+        
+        chld = {xmlModel.rxns(i).Children.Name};
+        [~,idx] = ismember('annotation',chld);
+        xmlModel.rxns(i).annotation = xmlModel.rxns(i).Children(idx).Children(2).Children(2).Attributes;
+        
+        [~,idx] = ismember('notes',chld);
+        ec = xmlModel.rxns(i).Children(idx).Children(2).Children(2).Children.Data;
+        xmlModel.rxns(i).ec = regexprep(strrep(ec,'EC Number:',''),'^(\s)+','');
         
         xmlModel.rxns(i).Children = xmlModel.rxns(i).Children(2:2:end);
     end
@@ -507,17 +516,20 @@ function xmlModel = getAnnotations(filename)
     xmlModel.rxns = rmfield(xmlModel.rxns,'Children');
 end
 
-function [idsMet] = parseMetID(id)
+function [idsMet,comps] = parseMetID(id)
     idsMet = '';
+    comps = '';
     [~,aux] = regexp(id,'(?<met>.+)_(?<comp3>.+)_(?<comp2>.+)_(?<comp1>.+)','tokens','names');
      
     if isempty(aux)
        [~,aux] = regexp(id,'(?<met>.+)_(?<comp2>.+)_(?<comp1>.+)','tokens','names');
     else
         if isnan(str2double(aux.comp3))&&isnan(str2double(aux.comp2))
-            idsMet = [aux.met,'_[',aux.comp3,']_[',aux.comp2,']_[',aux.comp1,']'];
+            idsMet = [aux.met,'[',aux.comp3,']_[',aux.comp2,']_[',aux.comp1,']'];
+            comps = ['[',aux.comp3,']_[',aux.comp2,']_[',aux.comp1,']'];
         elseif ~isnan(str2double(aux.comp3))&&isnan(str2double(aux.comp2))
-            idsMet = [aux.met,'_',aux.comp3,'_[',aux.comp2,']_[',aux.comp1,']'];
+            idsMet = [aux.met,'_',aux.comp3,'[',aux.comp2,']_[',aux.comp1,']'];
+            comps = ['[',aux.comp2,']_[',aux.comp1,']'];
         end
     end
     
@@ -526,14 +538,35 @@ function [idsMet] = parseMetID(id)
     else
         if isempty(idsMet)
             if isnan(str2double(aux.comp2))
-                idsMet = [aux.met,'_[',aux.comp2,']_[',aux.comp1,']'];
+                idsMet = [aux.met,'[',aux.comp2,']_[',aux.comp1,']'];
+                comps = ['[',aux.comp2,']_[',aux.comp1,']'];
             else
-                idsMet = [aux.met,'_',aux.comp2,'_[',aux.comp1,']'];
+                idsMet = [aux.met,'_',aux.comp2,'[',aux.comp1,']'];
+                comps = ['[',aux.comp1,']'];
             end
         end
     end   
     
     if isempty(idsMet)
-        idsMet = [aux.met,'_[',aux.comp1,']'];
+        idsMet = [aux.met,'[',aux.comp1,']'];
+        comps = ['[',aux.comp1,']'];
     end    
+end
+
+function str = formatID(str)
+str = strrep(str,'_DASH_','-');
+str = strrep(str,'_FSLASH_','/');
+str = strrep(str,'_BSLASH_','\');
+str = strrep(str,'_LPAREN_','(');
+str = strrep(str,'_RPAREN_',')');
+str = strrep(str,'_LSQBKT_','[');
+str = strrep(str,'_RSQBKT_',']');
+str = strrep(str,'_COMMA_',',');
+str = strrep(str,'_PERIOD_','.');
+str = strrep(str,'_APOS_','''');
+str = regexprep(str,'_e','\(e\)$');
+str = strrep(str,'&amp;','&');
+str = strrep(str,'&lt;','<');
+str = strrep(str,'&gt;','>');
+str = strrep(str,'&quot;','"');
 end
