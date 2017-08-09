@@ -96,7 +96,9 @@ function [Aeq,beq] = getConstraintInitialAmounts(model)
         Aeq(t,idx) = model.proteinWeights*model.epsilon;
 
         idx = getIndexVariable(model,'y0',1:1:model.noStorage);
-        Aeq(t,idx) = model.storageWeight;
+        if (~isempty(idx))
+            Aeq(t,idx) = model.storageWeight;
+        end
 
         beq(1) = 1;
 
