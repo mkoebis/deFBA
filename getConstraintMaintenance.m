@@ -52,34 +52,37 @@ function [Aineq,bineq] = getConstraintMaintenance(model)
     cons = emptySolutionStruct(model);
     Aineq = sparse(model.N,size(toVector(cons,model),2));
     bineq = zeros(1,model.N);
-    t = 1;
-    for i = 1:model.N
-        if (i==1)
-            idx = getIndexVariable(model,'y0',1:1:model.noStorage);
-            Aineq(t,idx) = model.storageWeight*model.maintenanceValue;
+    
+    if (isfield(model,'maintenanceID'))&&(~isempty(model.maintenanceID))
+        t = 1;
+        for i = 1:model.N
+            if (i==1)
+                idx = getIndexVariable(model,'y0',1:1:model.noStorage);
+                Aineq(t,idx) = model.storageWeight*model.maintenanceValue;
 
-            idx = getIndexVariable(model,'p0',1:1:model.sizeQuotaMet);
-            Aineq(t,idx) = model.quotaWeights*model.maintenanceValue;
+                idx = getIndexVariable(model,'p0',1:1:model.sizeQuotaMet);
+                Aineq(t,idx) = model.quotaWeights*model.maintenanceValue;
 
-            idx = getIndexVariable(model,'p0',model.sizeQuotaMet+1:1:model.sizePmet);
-            Aineq(t,idx) = model.proteinWeights*model.epsilon*model.maintenanceValue;
+                idx = getIndexVariable(model,'p0',model.sizeQuotaMet+1:1:model.sizePmet);
+                Aineq(t,idx) = model.proteinWeights*model.epsilon*model.maintenanceValue;
 
-            idx = getIndexVariable(model,'v',i,findRxnIDs(model,model.maintenanceID));
-            Aineq(t,idx) = 1;
-        else
-            idx = getIndexVariable(model,'y',i-1,1:1:model.noStorage);
-            Aineq(t,idx) = model.storageWeight*model.maintenanceValue;
+                idx = getIndexVariable(model,'v',i,findRxnIDs(model,model.maintenanceID));
+                Aineq(t,idx) = 1;
+            else
+                idx = getIndexVariable(model,'y',i-1,1:1:model.noStorage);
+                Aineq(t,idx) = model.storageWeight*model.maintenanceValue;
 
-            idx = getIndexVariable(model,'p',i-1,1:1:model.sizeQuotaMet);
-            Aineq(t,idx) = model.quotaWeights*model.maintenanceValue;
+                idx = getIndexVariable(model,'p',i-1,1:1:model.sizeQuotaMet);
+                Aineq(t,idx) = model.quotaWeights*model.maintenanceValue;
 
-            idx = getIndexVariable(model,'p',i-1,model.sizeQuotaMet+1:1:model.sizePmet);
-            Aineq(t,idx) = model.proteinWeights*model.epsilon*model.maintenanceValue;
+                idx = getIndexVariable(model,'p',i-1,model.sizeQuotaMet+1:1:model.sizePmet);
+                Aineq(t,idx) = model.proteinWeights*model.epsilon*model.maintenanceValue;
 
-            idx = getIndexVariable(model,'v',i,findRxnIDs(model,model.maintenanceID));
-            Aineq(t,idx) = 1;
-        end
-        
-        t = t+1;
-    end    
+                idx = getIndexVariable(model,'v',i,findRxnIDs(model,model.maintenanceID));
+                Aineq(t,idx) = 1;
+            end
+
+            t = t+1;
+        end    
+    end
 end
