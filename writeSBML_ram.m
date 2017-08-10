@@ -416,9 +416,6 @@ if isfield(model,'gprComp')
     end
 end
 
-
-
-
 gprIdx = true(length(geneProductRxn),1);
 for i=1:length(geneProductRxn)
     if isempty(geneProductRxn{i})

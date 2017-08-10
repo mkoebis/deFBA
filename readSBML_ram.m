@@ -89,11 +89,6 @@ storage = [];
 for i = 1:nMets
     % parse metabolite id
     metID = speciesList{i};
-%     idx = strfind(metID,'_');
-%     if ~isempty(idx)
-%         idx = idx(end);
-%         metID = [metID(1:idx-1),'[',metID(idx+1:end),']'];
-%     end
 
     [mets{i},cmps{i}] = parseMetID(formatID(metID));
     metNames{i} = tmpSpecies(i).name;
