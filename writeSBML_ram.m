@@ -532,7 +532,6 @@ for i=1:size(model.rxns, 1)
     else
         t.fbc_geneProductAssociation='';
     end
-    
    
     if i==1;
         sbmlModel.reaction=t;

@@ -146,16 +146,19 @@ function result = run_deFBA(model,solver)
             % get solution if it exists
             if lpProb.Solution.status == 1
                 result = lpProb.Solution.x;
+                if model.beta > 0
+                    [result, ~] = transformDilutionResult(result,model);
+                end
+                [result,~] = transformEpsilonScaling(result,model);
+            else
+                result = [];
             end
             
             % if a dilution term was used for better numerics we scale back
             % the solution. Please note that if the dilution term is too
             % large the problem may be infeasible and reducing it might
             % help make it feasible again
-            if model.beta > 0
-                [result, ~] = transformDilutionResult(result,model);
-            end
-            [result,~] = transformEpsilonScaling(result,model);
+            
             
     else if strcmp(solver,'soplex')
             ts = octave_random(0,intmax,1,1);

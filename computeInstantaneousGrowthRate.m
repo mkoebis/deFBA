@@ -51,11 +51,11 @@ function gr = computeInstantaneousGrowthRate(sol,model)
     gr = zeros(model.N+1,1);
     for i=0:model.N
         if i==0
-            gr(i+1) = sum(strsol.y0(1:2))+sum(strsol.p0(1:model.sizeQuotaMet))*model.quotaWeights+...
-                strsol.p0(model.sizeQuotaMet+1:end)*model.proteinWeights*model.epsilon;
+            gr(i+1) = strsol.y0(1:model.noStorage)*model.storageWeight+strsol.p0(1:model.sizeQuotaMet)*model.quotaWeights'+...
+                strsol.p0(model.sizeQuotaMet+1:end)*model.proteinWeights;
         else
-            gr(i+1) = sum(strsol.y(i,1:2))+sum(strsol.p(i,1:model.sizeQuotaMet))*model.quotaWeights+...
-                strsol.p(i,model.sizeQuotaMet+1:end)*model.proteinWeights*model.epsilon;
+            gr(i+1) = strsol.y(i,1:model.noStorage)*model.storageWeight+strsol.p(i,1:model.sizeQuotaMet)*model.quotaWeights'+...
+                strsol.p(i,model.sizeQuotaMet+1:end)*model.proteinWeights;
         end
     end
     

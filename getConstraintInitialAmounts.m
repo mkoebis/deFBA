@@ -61,7 +61,8 @@ function [Aeq,beq] = getConstraintInitialAmounts(model)
             Aeq1(t,idx) = 1;
             t = t+1;
 		end
-		beq1 = model.initialBiomass*model.epsilon;  
+		beq1 = model.initialBiomass;  
+        beq1(model.sizeQuotaMet+1:end) = beq1(model.sizeQuotaMet+1:end)/model.epsilon;
 	else
  		Aeq1 = [];
  		beq1 = [];

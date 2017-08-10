@@ -350,9 +350,6 @@ end
 
 %% correct enzyme names
 for i=1:length(enz)
-    i
-    i+sizeXmet+sizeYmet+sizeQuotaMet
-
     idx = find(rxnEnzRules(:,i));
     str = 'E';
     for k=1:length(idx)
