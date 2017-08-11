@@ -450,9 +450,11 @@ for i=1:length(geneProductRxn)
 end
 
 % add maintenance scaling parameter
-tmp_parameter.id = 'maintenancePercentage';
-tmp_parameter.value = model.maintenanceValue;
-sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
+if (isfield(model,'maintenanceValue'))
+    tmp_parameter.id = 'maintenancePercentage';
+    tmp_parameter.value = model.maintenanceValue;
+    sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
+end
 count=1;
 for i=1:size(model.rxns, 1)   
     % write EC number
