@@ -67,7 +67,7 @@ function [Aineq,bineq] = getConstraintMaintenance(model)
                 Aineq(t,idx) = model.proteinWeights*model.epsilon*model.maintenanceValue;
 
                 idx = getIndexVariable(model,'v',i,findRxnIDs(model,model.maintenanceID));
-                Aineq(t,idx) = 1;
+                Aineq(t,idx) = -1;
             else
                 idx = getIndexVariable(model,'y',i-1,1:1:model.noStorage);
                 Aineq(t,idx) = model.storageWeight*model.maintenanceValue;
@@ -79,7 +79,7 @@ function [Aineq,bineq] = getConstraintMaintenance(model)
                 Aineq(t,idx) = model.proteinWeights*model.epsilon*model.maintenanceValue;
 
                 idx = getIndexVariable(model,'v',i,findRxnIDs(model,model.maintenanceID));
-                Aineq(t,idx) = 1;
+                Aineq(t,idx) = -1;
             end
 
             t = t+1;

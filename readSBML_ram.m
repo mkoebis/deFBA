@@ -1,4 +1,4 @@
-function model = readSBML_ram(fileName,externalCompartmentID)
+function model = readSBML_ram(fileName,externalCompartmentID,renameEnzymesFlag)
 
 % readSBML_adjusted reads in a SBML model in ram format as a deFBA matlab structure
 %
@@ -90,7 +90,15 @@ for i = 1:nMets
     % parse metabolite id
     metID = speciesList{i};
 
-    [mets{i},cmps{i}] = parseMetID(formatID(metID));
+    [m,c] = parseMetID(formatID(metID));
+    
+    if ~strcmp(m,'[]')&&~strcmp(c,'[]')
+        mets{i} = m;
+        cmps{i} = c;
+    else
+        mets{i} = metID;
+        cmps{i} = '';
+    end
     metNames{i} = tmpSpecies(i).name;
     
     if strcmp(tmpSpecies(i).compartment,externalCompartmentID)
@@ -186,7 +194,9 @@ gprComp = cell(nRxns,1);
 
 for i = 1:nRxns
     %% read EC number
-    ecNumbers{i} = xmlModel.rxns(i).ec;
+    if isfield(xmlModel.rxns(i),'ec')
+        ecNumbers{i} = xmlModel.rxns(i).ec;
+    end
 
     %% read the gene product association and at the same time build rxnEnzRules,enz,genes,rxnGeneMat
     if isfield(modelSBML.reaction,'fbc_geneProductAssociation')
@@ -344,16 +354,18 @@ for i=1:nRxns
 end
 
 %% correct enzyme names
-for i=1:length(enz)
-    idx = find(rxnEnzRules(:,i));
-    str = 'E';
-    for k=1:length(idx)
-        str = [str,'_',rxns{idx(k)}];
+if renameEnzymesFlag
+    for i=1:length(enz)
+        idx = find(rxnEnzRules(:,i));
+        str = 'E';
+        for k=1:length(idx)
+            str = [str,'_',rxns{idx(k)}];
+        end
+        str = [str,cmps{i+sizeXmet+sizeYmet+sizeQuotaMet}];
+
+        enz{i} = str;
+        mets{i+sizeXmet+sizeYmet+sizeQuotaMet} = str;
     end
-    str = [str,cmps{i+sizeXmet+sizeYmet+sizeQuotaMet}];
-    
-    enz{i} = str;
-    mets{i+sizeXmet+sizeYmet+sizeQuotaMet} = str;
 end
 
 %% collect everything into a structure
@@ -448,11 +460,27 @@ end
 
 function xmlModel = getAnnotations(filename)
     xmlModel = parseXML(filename);
-    xmlModel = xmlModel.Children(2);
-    xmlModel.mets = xmlModel.Children(8).Children(2:2:end);
-    xmlModel.rxns = xmlModel.Children(12).Children(2:2:end);
-    xmlModel.params = xmlModel.Children(10).Children(2:2:end);
-    xmlModel.geneProd = xmlModel.Children(14).Children(2:2:end);
+    ch = {xmlModel.Children.Name};       
+    xmlModel = xmlModel.Children(ismember(ch,'model'));
+    
+    ch = {xmlModel.Children.Name};
+    xmlModel.mets = xmlModel.Children(ismember(ch,'listOfSpecies'));
+    xmlModel.rxns = xmlModel.Children(ismember(ch,'listOfReactions'));
+    xmlModel.params = xmlModel.Children(ismember(ch,'listOfParameters'));
+    xmlModel.geneProd = xmlModel.Children(ismember(ch,'fbc:listOfGeneProducts'));
+    
+    ch = {xmlModel.mets.Children.Name};
+    xmlModel.mets = xmlModel.mets.Children(ismember(ch,'species'));
+    
+    ch = {xmlModel.rxns.Children.Name};
+    xmlModel.rxns = xmlModel.rxns.Children(ismember(ch,'reaction'));
+    
+    ch = {xmlModel.params.Children.Name};
+    xmlModel.params = xmlModel.params.Children(ismember(ch,'parameter'));
+    
+    ch = {xmlModel.geneProd.Children.Name};
+    xmlModel.geneProd = xmlModel.geneProd.Children(ismember(ch,'fbc:geneProduct'));
+    
     extmets = [];
     for i=1:length(xmlModel.mets)
         atts = {xmlModel.mets(i).Attributes.Name};
@@ -495,11 +523,19 @@ function xmlModel = getAnnotations(filename)
         
         chld = {xmlModel.rxns(i).Children.Name};
         [~,idx] = ismember('annotation',chld);
-        xmlModel.rxns(i).annotation = xmlModel.rxns(i).Children(idx).Children(2).Children(2).Attributes;
+        xmlModel.rxns(i).annotation = xmlModel.rxns(i).Children(idx);
         
-        [~,idx] = ismember('notes',chld);
-        ec = xmlModel.rxns(i).Children(idx).Children(2).Children(2).Children.Data;
-        xmlModel.rxns(i).ec = regexprep(strrep(ec,'EC Number:',''),'^(\s)+','');
+        chld = {xmlModel.rxns(i).annotation.Children.Name};
+        xmlModel.rxns(i).annotation = xmlModel.rxns(i).annotation.Children(ismember(chld,'ram:RAM'));
+        
+        chld = {xmlModel.rxns(i).annotation.Children.Name};
+        xmlModel.rxns(i).annotation = xmlModel.rxns(i).annotation.Children(ismember(chld,'ram:reaction')).Attributes;
+        
+        [idx] = ismember(chld,'notes');
+        if any(idx~=0)
+            ec = xmlModel.rxns(i).Children(idx).Children(2).Children(2).Children.Data;
+            xmlModel.rxns(i).ec = regexprep(strrep(ec,'EC Number:',''),'^(\s)+','');
+        end
         
         xmlModel.rxns(i).Children = xmlModel.rxns(i).Children(2:2:end);
     end

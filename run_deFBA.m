@@ -91,9 +91,9 @@ function result = run_deFBA(model,solver)
     fprintf('last internal metabolite: %s\n', model.Xmet{end})
     
     % verify enzymes
-    for i=1:model.sizePmet-model.sizeQuotaMet
-        assert(strcmp(model.mets{model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+i}, model.enz{i}));
-    end
+%     for i=1:model.sizePmet-model.sizeQuotaMet
+%         assert(strcmp(model.mets{model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+i}, model.enz{i}));
+%     end
     
     % compute Xrxn
     model.sizeXrxn = size(model.S,2)-model.sizeYrxn-model.sizePrxn;
