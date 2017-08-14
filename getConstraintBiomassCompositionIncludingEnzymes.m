@@ -1,7 +1,8 @@
-function [Aeq,beq,Aineq,bineq,lb,ub] = formulateConstraints(model)
-% formulateConstraints returns the equality and inequality constraint matrices and
-% right hand side vectors, and the lower and upper bounds needed to run
-% deFBA given a deFBA model structure
+function [Aineq,bineq] = getConstraintBiomassCompositionIncludingEnzymes(model)
+% getConstraintBiomassComposition returns, given a deFBA model structure, 
+% the inequality constraint matrix and its corresponding right hand side 
+% for imposing that at each time point each quota metabolite has to make up
+% a certain percentage of the total biomass
 %
 %INPUTS
 % model             deFBA model structure with the fields:
@@ -43,46 +44,36 @@ function [Aeq,beq,Aineq,bineq,lb,ub] = formulateConstraints(model)
 %   gprComp                     cell array that specifies for each reaction the recipe for building its corresponding enzyme from the individual gene ids ( e.g. 3*gene1 AND 2*gene2 means that the enzyme is made of three copies of gene1 and 2 copies of gene2)
 %
 %OUTPUT
-% Aeq           matrix containing all equality constraints for deFBA: rows = constraints, columns = LP variables
-% beq           vector containing the right hand side of all equality constraints in Aeq
-% Aineq         matrix containing all inequality constraints for deFBA: rows = constraints, columns = LP variables
-% bineq         vector containing the right hand side of all inequality constraints in Aineq, s.t. Aineq*x<=bineq, where x is the solution vector
-% lb            vector containing all variable lower bounds
-% ub            vector containing all variable upper bounds
+% Aineq         matrix containing biomass composition inequality constraint for deFBA: rows = constraints, columns = LP variables
+% bineq         vector containing the right hand side of the biomass composition inequality constraint in Aineq, s.t. Aineq*x<=bineq, where x is the solution vector
 % 
 % Alexandra Reimers 14/07/2017
 
-    [Aeq1,beq1] = getConstraintStorageAndExtracellularDynamics(model);
-    disp('formulated ydot=Sv') 
+    cons = emptySolutionStruct(model);    
+    Aineq = sparse(model.N*length(model.quotaInitial),size(toVector(cons,model),2));
+    bineq = zeros(1,model.N*length(model.quotaInitial));
     
-    [Aeq2,beq2] = getConstraintMacromoleculeDynamics(model);
-    disp('formulated pdot=Sv')
+    weights = [model.quotaWeights;model.proteinWeights];
+    assert(length(weights)==length(model.quotaInitial));
     
-    [Aeq3,beq3] = getConstraintMetaboliteSteadyState(model);
-    disp('formulated constraint steady state')
-    
-    [AineqH,bineqH] = getConstraintEnzymeCapacity(model);
-    disp('formulated constraint kcat')    
-    
-    [AeqH,beqH] = getConstraintDiscretization(model);
-    disp('formulated constraint yi=yi-1+h/2ydot')
-    
-    [Aeq6,beq6] = getConstraintInitialAmounts(model);
-    disp('formulated constraint initial y and bound on initial p')
-    
-    %[Aineq6,bineq6] = getConstraintBiomassComposition(model);
-    [Aineq6,bineq6] = getConstraintBiomassCompositionIncludingEnzymes(model);
-    disp('formulated biomass composition constraint')
-    
-    [AineqM,bineqM] = getConstraintMaintenance(model);
-    disp('formulated maintenance constraint')
-    
-    [lb,ub] = getBounds(model);
-    disp('formulated variable bounds')
-    
-    Aeq = [Aeq1;Aeq2;Aeq3;AeqH;Aeq6];
-    beq = [beq1,beq2,beq3,beqH,beq6];
-    
-    Aineq = [AineqH;Aineq6;AineqM];
-    bineq  = [bineqH,bineq6,bineqM];
+    t = 1;
+    for j=1:length(model.quotaInitial)
+        for i=1:model.N        
+            idx = getIndexVariable(model,'p',i,j);
+            Aineq(t,idx) = weights(j)*(model.quotaInitial(j)-1);
+            
+            qidx = [1:1:j-1, j+1:1:length(model.quotaInitial)];
+            idx = getIndexVariable(model,'p',i,qidx);
+            Aineq(t,idx) = weights(j)*model.quotaInitial(j);
+            
+            idx = getIndexVariable(model,'p',i,model.sizeQuotaMet+1:1:model.sizePmet);
+            Aineq(t,idx) = Aineq(t,idx)*model.epsilon;
+            
+            idx = getIndexVariable(model,'y',i,1:1:model.noStorage);
+            Aineq(t,idx) = model.storageWeight*model.quotaInitial(j);
+            
+            t = t+1;
+        end
+    end
+
 end
