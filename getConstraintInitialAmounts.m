@@ -85,8 +85,8 @@ function [Aeq,beq] = getConstraintInitialAmounts(model)
     % the constraint below should only be active when we do not impose an
     % initial biomass
     if ~isfield(model,'initialBiomass')    
-        Aeq = sparse(model.sizeQuotaMet+1,size(toVector(cons,model),2));
-        beq = zeros(1,model.sizeQuotaMet+1);
+        Aeq = sparse(length(model.quotaInitial)+1,size(toVector(cons,model),2));
+        beq = zeros(1,length(model.quotaInitial)+1);
         % sum(quota0)+sum(prot0)+sum(storage0)=1g
         t=1;
         
@@ -105,9 +105,12 @@ function [Aeq,beq] = getConstraintInitialAmounts(model)
 
         % p0(quota)=quotaInitial
         t=t+1;
-        for l = 1:model.sizeQuotaMet
+        for l = 1:length(model.quotaInitial)
             idx = getIndexVariable(model,'p0',l);
-            Aeq(t,idx) = 1;
+            % only fix the nonzero ones
+            if model.quotaInitial(l)~=0
+                Aeq(t,idx) = 1;
+            end
             t = t+1;
         end
 

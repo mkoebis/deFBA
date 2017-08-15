@@ -241,9 +241,9 @@ tmp_metCompartment = cell(length(model.mets),1);
 comps = cell(length(model.mets),1);
 idsMet = cell(length(model.mets),1);
 
-for i=length(model.mets):-1:1
-    [idsMet{i},comps{i},tmp_metCompartment{i}] = parseMetID(model.mets{i});
-end
+% for i=length(model.mets):-1:1
+%     [idsMet{i},comps{i},tmp_metCompartment{i}] = parseMetID(model.mets{i});
+% end
 
 sbmlModel.species=tmp_species;
 
@@ -259,11 +259,15 @@ c = 1;
 %% metabolites
 for i=1:length(model.mets)
     tmp_note='';
-    
-    tmp_species.id = [idsMet{i},'_',comps{i}];
+    if ~isfield(model,'metCompartments')
+        [idsMet{i},comps{i},tmp_metCompartment{i}] = parseMetID(model.mets{i});
+        tmp_species.id = [idsMet{i},'_',comps{i}];        
+        tmp_species.compartment = tmp_metCompartment{i};
+    else
+        tmp_species.id = formatID(model.mets{i});
+        tmp_species.compartment = model.metCompartments{i};
+    end
     tmp_species.name = model.metNames{i};
-    tmp_species.compartment = tmp_metCompartment{i};
-
     % take care of nonlimiting extracellular metabolites
     if strcmp(tmp_species.compartment,externalCompID)
         tmp_species.initialAmount = 0;
@@ -274,6 +278,8 @@ for i=1:length(model.mets)
         tmp_species.constant = 0;
         tmp_species.boundaryCondition = 0;
     end
+    
+   
 
 %% annotations for metabolites
  tmp_noteBegin = sprintf('<annotation>\n<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n<ram:species');
@@ -341,7 +347,7 @@ end
 
 %% compartments.
 
-tmp_metCompartment = unique(tmp_metCompartment);
+tmp_metCompartment = unique(model.metCompartments);
 
 for i=1:length(tmp_metCompartment)
     if ~isempty(tmp_metCompartment) % in the case of an empty model
@@ -372,47 +378,11 @@ if isfield(model,'gprComp')
         idx = find(model.rxnEnzRules(i,:));
         % find index of corresponding enzyme in sbml
         idx = model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+idx;        
-        idx2 = find(model.rxnEnzRules(i,:));
-             
-        % correct ids and names of enzymes
-        gIdx = find(model.rxnGeneMat(i,:));
-        if length(gIdx)==1            
-            rIdx = find(model.rxnEnzRules(:,idx2));
-            for j=1:length(rIdx)
-                if j==1
-                    aux = sprintf('enzyme catalyzing reaction(s) %s',model.rxns{rIdx(j)});
-                else
-                    aux = sprintf('%s %s',aux,model.rxns{rIdx(j)});
-                end
-            end     
-            sbmlModel.species(idx).name = aux;
-            
-            sbmlModel.species(idx).id = [model.genes{gIdx},'_',comps{idx}];
-      
+        idx2 = find(model.rxnEnzRules(i,:));            
+  
+        if ~isempty(idx)
             geneProductRxn{i} = sbmlModel.species(idx).id;
-        elseif length(gIdx)>1
-            if isempty(strfind(sbmlModel.species(idx).id,'complex'))
-                rIdx = find(model.rxnEnzRules(:,idx2));
-                for j=1:length(rIdx)
-                    if j==1
-                        aux = sprintf('enzyme complex catalyzing reaction(s) %s',model.rxns{rIdx(j)});
-                    else
-                        aux = sprintf('%s %s',aux,model.rxns{rIdx(j)});
-                    end
-                end     
-
-                sbmlModel.species(idx).name = aux;                
-
-                sbmlModel.species(idx).id = sprintf('complex_%d',t);
-                t = t+1;
-                
-                sbmlModel.species(idx).id = [sbmlModel.species(idx).id,'_',comps{idx}];            
-                geneProductRxn{i} = sbmlModel.species(idx).id;
-            else
-                geneProductRxn{i} = sbmlModel.species(idx).id;
-            end
-        end
-        
+        end        
     end
 end
 

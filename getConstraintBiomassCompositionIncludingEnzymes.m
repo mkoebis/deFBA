@@ -53,24 +53,36 @@ function [Aineq,bineq] = getConstraintBiomassCompositionIncludingEnzymes(model)
     Aineq = sparse(model.N*length(model.quotaInitial),size(toVector(cons,model),2));
     bineq = zeros(1,model.N*length(model.quotaInitial));
     
+    if (size(model.proteinWeights,1)==1)
+        model.proteinWeights = model.proteinWeights';
+    end
+    
+    if (size(model.quotaWeights,1)==1)
+        model.quotaWeights = model.quotaWeights';
+    end
+    
     weights = [model.quotaWeights;model.proteinWeights];
     assert(length(weights)==length(model.quotaInitial));
     
     t = 1;
     for j=1:length(model.quotaInitial)
-        for i=1:model.N        
-            idx = getIndexVariable(model,'p',i,j);
-            Aineq(t,idx) = weights(j)*(model.quotaInitial(j)-1);
+        for i=1:model.N  
+            if (model.quotaInitial(j)~=0)
+                    idx = getIndexVariable(model,'p',i,j);
+                    Aineq(t,idx) = weights(j)*(model.quotaInitial(j)-1);
             
-            qidx = [1:1:j-1, j+1:1:length(model.quotaInitial)];
-            idx = getIndexVariable(model,'p',i,qidx);
-            Aineq(t,idx) = weights(j)*model.quotaInitial(j);
-            
-            idx = getIndexVariable(model,'p',i,model.sizeQuotaMet+1:1:model.sizePmet);
-            Aineq(t,idx) = Aineq(t,idx)*model.epsilon;
-            
-            idx = getIndexVariable(model,'y',i,1:1:model.noStorage);
-            Aineq(t,idx) = model.storageWeight*model.quotaInitial(j);
+                    qidx = [1:1:j-1, j+1:1:length(model.quotaInitial)];
+                    idx = getIndexVariable(model,'p',i,qidx);
+                    Aineq(t,idx) = weights(j)*model.quotaInitial(j);
+
+                    idx = getIndexVariable(model,'p',i,model.sizeQuotaMet+1:1:model.sizePmet);
+                    Aineq(t,idx) = Aineq(t,idx)*model.epsilon;
+
+                    idx = getIndexVariable(model,'y',i,1:1:model.noStorage);
+                    if ~isempty(idx)
+                        Aineq(t,idx) = model.storageWeight*model.quotaInitial(j);
+                    end
+            end
             
             t = t+1;
         end

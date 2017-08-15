@@ -59,6 +59,7 @@ nRxns = length(modelSBML.reaction);
 
 %% get initial metabolite list
 speciesList = {};
+metCompartments = {};
 tmpSpecies = [];
 
 for i = 1:nMets
@@ -66,6 +67,7 @@ for i = 1:nMets
     if (~(modelSBML.species(i).boundaryCondition && modelSBML.species(i).constant))
         tmpSpecies = [tmpSpecies  modelSBML.species(i)];
         speciesList{end+1} = modelSBML.species(i).id;  
+        metCompartments{end+1} = modelSBML.species(i).compartment;
     end
 end
 
@@ -191,107 +193,73 @@ genes = {};
 grRules = cell(nRxns,1);
 rxnNames = cell(nRxns,1);
 gprComp = cell(nRxns,1);
-
+fbcGeneIDs = {xmlModel.geneProd.id};
 for i = 1:nRxns
     %% read EC number
     if isfield(xmlModel.rxns(i),'ec')
         ecNumbers{i} = xmlModel.rxns(i).ec;
     end
 
-    %% read the gene product association and at the same time build rxnEnzRules,enz,genes,rxnGeneMat
-    if isfield(modelSBML.reaction,'fbc_geneProductAssociation')
-        if size(modelSBML.reaction(i).fbc_geneProductAssociation,2)~=0 % the Matlab structure of the "geneAssociation" is defined.
-            if size(modelSBML.reaction(i).fbc_geneProductAssociation.fbc_association,2)~=0
-                tmpGeneProduct = modelSBML.reaction(i).fbc_geneProductAssociation.fbc_association.fbc_association;
-                gprComp{i} = tmpGeneProduct;
-                if ~strcmp(tmpGeneProduct,'')
-                    if isempty(strfind(tmpGeneProduct,' AND '))% name given directly by gene -> strip the stoichiometry
-                        tmpName = tmpGeneProduct(strfind(tmpGeneProduct,'*')+1:end);
+    %% read the gene product association and at the same time build rxnEnzRules,enz,genes,rxnGeneMat    
+    if ~isempty(xmlModel.rxns(i).geneProductAssociation) 
+        % get associated species
+        idx = ismember(fbcGeneIDs,xmlModel.rxns(i).geneProductAssociation);
+        e = xmlModel.geneProd(idx).associatedSpecies;
+        gprComp{i} = xmlModel.geneProd(idx).label;
+        if isempty(strfind(xmlModel.geneProd(idx).label,' AND '))% only one gene involved
+            tmpName = xmlModel.geneProd(idx).label(strfind(xmlModel.geneProd(idx).label,'*')+1:end);
 
-                        %strip potential underscores and number after that
-                        if ~isempty(strfind(tmpName,'_'))
-                            tmpName = tmpName(1:(strfind(tmpName,'_')-1));
-                        end
+            %strip potential underscores and number after that
+            if ~isempty(strfind(tmpName,'_'))
+                tmpName = tmpName(1:(strfind(tmpName,'_')-1));
+            end
 
-                        if ~ismember(tmpName,genes)
-                            genes{nGenes+1} = tmpName;
-                            nGenes = nGenes+1;
-                            grRules{i} = tmpName;
-                            tmpUnitVector = zeros(nRxns,1);
-                            tmpUnitVector(i) = 1;
-                            rxnGeneMat = [rxnGeneMat,tmpUnitVector];
-                        else
-                            grRules{i} = tmpName;                      
-                            [~,idx] = ismember(tmpName,genes);
-                            rxnGeneMat(i,idx) = 1;                        
-                        end
-                        idx = ~cellfun(@isempty,strfind(enz,tmpName));
-                        % check if it catalyses rxns in different compartments
-                        if length(find(idx))>1
-                            s = find(idx);
-                            for h=1:length(s)
-                                % assign it to the first that is not yet assigned and skip the rest
-                                if sum(rxnEnzRules(:,s(h))) == 0
-                                    rxnEnzRules(i,s(h)) = 1;
-                                    break;
-                                end
-                            end
-                        else
-                            rxnEnzRules(i,idx) = 1;
-                        end
-                    else % name is a complex
-                        for k=1:length(modelSBML.fbc_geneProduct)
-                            if strcmp(modelSBML.fbc_geneProduct(k).fbc_label,tmpGeneProduct)
-                                tmpName = modelSBML.fbc_geneProduct(k).fbc_id;
-                                break;
-                            end
-                        end
-                        idx = ~cellfun(@isempty,strfind(enz,tmpName));
-                        % check if it catalyses rxns in different compartments
-                        if length(find(idx))>1
-                            s = find(idx);
-                            for h=1:length(s)
-                                % assign it to the first that is not yet assigned and skip the rest
-                                if sum(rxnEnzRules(:,s(h))) == 0
-                                    rxnEnzRules(i,s(h)) = 1;
-                                    break;
-                                end
-                            end
-                        else
-                            rxnEnzRules(i,idx) = 1;
-                        end
-
-                        % get gene names and add them
-                        idx = k;
-                        gr = modelSBML.fbc_geneProduct(idx).fbc_label;
-                        tokens = strsplit(gr,' AND ');
-                        grRules{i} = '';
-
-                        for z = 1:length(tokens)
-                            t = tokens{z};
-                            tmpNameG = t(cell2mat(strfind(tokens(z),'*'))+1:end);
-                            if ~ismember(tmpNameG,genes)
-                                genes{nGenes+1} = tmpNameG;
-                                nGenes = nGenes+1;
-                                tmpUnitVector = zeros(nRxns,1);
-                                tmpUnitVector(i) = 1;
-                                rxnGeneMat = [rxnGeneMat,tmpUnitVector];
-                            else
-                                [~,idx] = ismember(tmpNameG,genes);
-                                rxnGeneMat(i,idx) = 1;
-                            end
-                            grRules{i} = [grRules{i},tmpNameG,' AND '];
-                        end
-                        tmpString = grRules{i};
-                        grRules{i} = tmpString(1:end-5);
-                    end
-                else % if it doesn't have a gene association then it is spontaneous
-                    spontaneousRxn(i) = 1;
+            if ~ismember(tmpName,genes)
+                genes{nGenes+1} = tmpName;
+                nGenes = nGenes+1;
+                grRules{i} = tmpName;
+                tmpUnitVector = zeros(nRxns,1);
+                tmpUnitVector(i) = 1;
+                rxnGeneMat = [rxnGeneMat,tmpUnitVector];
+            else
+                grRules{i} = tmpName;                      
+                [~,idx] = ismember(tmpName,genes);
+                rxnGeneMat(i,idx) = 1;                        
+            end
+            
+            [~,idx] = ismember(enz,e);            
+            rxnEnzRules(i,logical(idx)) = 1;
+        else % complex
+            %split label
+            g = strsplit(xmlModel.geneProd(idx).label,' AND ');
+            
+            for k=1:length(g)
+                tmpName = g{k};
+                tmpName = tmpName(strfind(tmpName,'*')+1:end);
+                g{k} = tmpName;
+                
+                if ~ismember(tmpName,genes)
+                    genes{nGenes+1} = tmpName;
+                    nGenes = nGenes+1;
+                    %grRules{i} = tmpName;
+                    tmpUnitVector = zeros(nRxns,1);
+                    tmpUnitVector(i) = 1;
+                    rxnGeneMat = [rxnGeneMat,tmpUnitVector];
+                else
+                    %grRules{i} = tmpName;                      
+                    [~,idx] = ismember(tmpName,genes);
+                    rxnGeneMat(i,idx) = 1;                        
                 end
             end
-        else
-             spontaneousRxn(i) = 1;
+            
+            tmpGrRule = strjoin(g, ' AND ');
+            grRules{i} = tmpGrRule;
+            
+            [~,idx] = ismember(enz,e);            
+            rxnEnzRules(i,logical(idx)) = 1;           
         end
+    else
+         spontaneousRxn(i) = 1;
     end
     
     rev(i) = modelSBML.reaction(i).reversible;
@@ -321,30 +289,20 @@ end
 kcat = rxnEnzRules;
 tmp_rxns = modelSBML.reaction;
 for i=1:nRxns
-    for j=1:length(xmlModel.rxns(i).annotation)
-        if strcmp(xmlModel.rxns(i).annotation(j).Name,'ram:kcatForward')
-            for k=1:length(xmlModel.params)
-                if strcmp(xmlModel.params(k).id,xmlModel.rxns(i).annotation(j).Value)
-                    kplus = str2double(xmlModel.params(k).value);
-                end
-            end
-        end
-        if strcmp(xmlModel.rxns(i).annotation(j).Name,'ram:kcatBackward')
-            for k=1:length(xmlModel.params)
-                if strcmp(xmlModel.params(k).id,xmlModel.rxns(i).annotation(j).Value)
-                    kminus = str2double(xmlModel.params(k).value);
-                end
-            end
-        end
-        if strcmp(xmlModel.rxns(i).annotation(j).Name,'ram:maintenanceScaling')
-            for k=1:length(xmlModel.params)
-                if strcmp(xmlModel.params(k).id,xmlModel.rxns(i).annotation(j).Value)
-                    maintenanceScale = str2double(xmlModel.params(k).value);
-                end
-            end
-        end
-    end
+    ann = {xmlModel.rxns(i).annotation.Name};
+    idx = ismember(ann,'ram:kcatForward');
+    p = ismember({xmlModel.params.id},xmlModel.rxns(i).annotation(idx).Value);
+    kplus = str2double(xmlModel.params(p).value);
     
+    
+    idx = ismember(ann,'ram:kcatBackward');
+    p = ismember({xmlModel.params.id},xmlModel.rxns(i).annotation(idx).Value);
+    kminus = str2double(xmlModel.params(p).value);
+    
+    idx = ismember(ann,'ram:maintenanceScaling');
+    p = ismember({xmlModel.params.id},xmlModel.rxns(i).annotation(idx).Value);
+    maintenanceScale = str2double(xmlModel.params(p).value);
+       
    kcat(i,logical(rxnEnzRules(i,:))) = kplus;
    
    if maintenanceScale>0 || ~isempty(strfind(tmp_rxns(i).id,'maintenance'))
@@ -371,6 +329,7 @@ end
 %% collect everything into a structure
 model.rxns = rxns;
 model.mets = mets;
+model.metCompartments = metCompartments;
 model.S = S;
 model.genes = columnVector(genes);
 model.N = 10;
@@ -436,6 +395,7 @@ model.spontaneousRxn = model.spontaneousRxn([Xrxn,exc,quotaRxn,enzRxn]);
 model.Kcat_f = model.Kcat_f([Xrxn,exc,quotaRxn,enzRxn],:);
 
 model.mets = model.mets([Xmet,storage,setdiff(Ymet,storage),quotaMet,enzMet]);
+model.metCompartments = model.metCompartments([Xmet,storage,setdiff(Ymet,storage),quotaMet,enzMet]);
 model.metNames = columnVector(metNames([Xmet,storage,setdiff(Ymet,storage),quotaMet,enzMet]));
 model.noRxn = length(model.rxns);
 
@@ -531,6 +491,21 @@ function xmlModel = getAnnotations(filename)
         chld = {xmlModel.rxns(i).annotation.Children.Name};
         xmlModel.rxns(i).annotation = xmlModel.rxns(i).annotation.Children(ismember(chld,'ram:reaction')).Attributes;
         
+        chld = {xmlModel.rxns(i).Children.Name};
+        [~,idx] = ismember('fbc:geneProductAssociation',chld);
+        if idx~=0
+            xmlModel.rxns(i).geneProductAssociation = xmlModel.rxns(i).Children(idx);
+        else
+            xmlModel.rxns(i).geneProductAssociation = '';
+        end
+        
+        if ~isempty(xmlModel.rxns(i).geneProductAssociation)
+            chld = {xmlModel.rxns(i).geneProductAssociation.Children.Name};
+            [~,idx] = ismember('fbc:geneProductRef',chld);
+            xmlModel.rxns(i).geneProductAssociation = xmlModel.rxns(i).geneProductAssociation.Children(idx).Attributes.Value;
+        end
+        
+        
         [idx] = ismember(chld,'notes');
         if any(idx~=0)
             ec = xmlModel.rxns(i).Children(idx).Children(2).Children(2).Children.Data;
@@ -539,6 +514,17 @@ function xmlModel = getAnnotations(filename)
         
         xmlModel.rxns(i).Children = xmlModel.rxns(i).Children(2:2:end);
     end
+    
+    for i=1:length(xmlModel.geneProd)
+        att = {xmlModel.geneProd(i).Attributes.Name};
+        idx = ismember(att, 'fbc:associatedSpecies');
+        xmlModel.geneProd(i).associatedSpecies = xmlModel.geneProd(i).Attributes(idx).Value;
+        idx = ismember(att, 'fbc:id');
+        xmlModel.geneProd(i).id = xmlModel.geneProd(i).Attributes(idx).Value;
+        idx = ismember(att, 'fbc:label');
+        xmlModel.geneProd(i).label = xmlModel.geneProd(i).Attributes(idx).Value;
+    end
+    
     xmlModel.rxns = rmfield(xmlModel.rxns,'Name');
     xmlModel.rxns = rmfield(xmlModel.rxns,'Data');
     xmlModel.rxns = rmfield(xmlModel.rxns,'Children');

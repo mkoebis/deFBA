@@ -78,11 +78,11 @@ function [Aineq,bineq] = getConstraintEnzymeCapacity(model)
 
 
             % special case for ribosome because of scaling
-            if l==length(model.enz)
+            if strcmp(model.enz(l),model.ribosomeID)
                 for j=1:length(idxRxns)
                     idxv = getIndexVariable(model,'v',i,idxRxns(j));
                     % quota is not scaled by epsilon
-                    if strcmp(model.rxns(idxRxns(j)),'BM0001')
+                    if strcmp(model.rxns(idxRxns(j)),model.ProtQuotaProdID)
                         Aineq(t,idxv) = 1/(model.epsilon*model.Kcat_f(idxRxns(j),end));
                     else
                         Aineq(t,idxv) = 1/model.Kcat_f(idxRxns(j),end);
