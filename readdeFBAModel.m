@@ -1,4 +1,4 @@
-function model = readdeFBAModel(fileName,externalCompartmentID,renameEnzymesFlag)
+function model = readdeFBAModel(fileName,externalCompartmentID)
 %readdeFBAmodel Read in a deFBA model from an SBML file using ram standard
 %
 % model = readdeFBAModel(fileName,externalCompartmentID, biomassCompartmentID, storageCompartmentID)
@@ -51,5 +51,5 @@ function model = readdeFBAModel(fileName,externalCompartmentID,renameEnzymesFlag
 %Alexandra Reimers 13/07/2017
 
 % Open a dialog to select file
-    model = readSBML_ram(fileName,externalCompartmentID,renameEnzymesFlag);
+    model = readSBML_ram(fileName,externalCompartmentID);
 end

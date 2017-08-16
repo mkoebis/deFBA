@@ -1,4 +1,4 @@
-function model = readSBML_ram(fileName,externalCompartmentID,renameEnzymesFlag)
+function model = readSBML_ram(fileName,externalCompartmentID)
 
 % readSBML_adjusted reads in a SBML model in ram format as a deFBA matlab structure
 %
@@ -81,7 +81,6 @@ rxns = cell(nRxns,1);
 
 %% build metabolite list and get sizes
 mets = cell(nMets,1);
-cmps = cell(nMets,1);
 metNames = cell(nMets,1);
 Ymet = [];
 quotaMet = [];
@@ -89,18 +88,7 @@ enzMet = [];
 storage = [];
 
 for i = 1:nMets
-    % parse metabolite id
-    metID = speciesList{i};
-
-    [m,c] = parseMetID(formatID(metID));
-    
-    if ~strcmp(m,'[]')&&~strcmp(c,'[]')
-        mets{i} = m;
-        cmps{i} = c;
-    else
-        mets{i} = metID;
-        cmps{i} = '';
-    end
+    mets{i} = speciesList{i};
     metNames{i} = tmpSpecies(i).name;
     
     if strcmp(tmpSpecies(i).compartment,externalCompartmentID)
@@ -133,9 +121,10 @@ sizeYmet = length(storage) +length(Ymet);
 noStorage = length(storage);
 
 % get quotaInitial
-quota_tmp = xmlModel.mets(quotaMet);
-quotaInitial = zeros(1,sizeQuotaMet);
+quota_tmp = [xmlModel.mets([quotaMet,enzMet])];
+quotaInitial = zeros(1,sizePmet);
 quotaWeights = zeros(1,sizeQuotaMet);
+c = 0;
 for i=1:length(quota_tmp)
     for j=1:length(quota_tmp(i).annotation)
         if strcmp(quota_tmp(i).annotation(j).Name,'ram:biomassPercentage')
@@ -148,7 +137,10 @@ for i=1:length(quota_tmp)
         if strcmp(quota_tmp(i).annotation(j).Name,'ram:molecularWeight')
             for k=1:length(xmlModel.params)
                 if strcmp(xmlModel.params(k).id,quota_tmp(i).annotation(j).Value)
-                    quotaWeights(i) = str2double(xmlModel.params(k).value);
+                    if ismember(quota_tmp(i).id,mets(quotaMet))
+                        c = c+1;
+                        quotaWeights(c) = str2double(xmlModel.params(k).value);
+                    end
                 end
             end
         end
@@ -264,7 +256,7 @@ for i = 1:nRxns
     
     rev(i) = modelSBML.reaction(i).reversible;
     rxnNames{i} = modelSBML.reaction(i).name;
-    rxns{i} = formatID(modelSBML.reaction(i).id);
+    rxns{i} = modelSBML.reaction(i).id;
     
     % Construct S-matrix
     reactantStruct = modelSBML.reaction(i).reactant;
@@ -309,21 +301,6 @@ for i=1:nRxns
        maintenanceID = tmp_rxns(i).id;
        maintenanceValue = maintenanceScale;
    end
-end
-
-%% correct enzyme names
-if renameEnzymesFlag
-    for i=1:length(enz)
-        idx = find(rxnEnzRules(:,i));
-        str = 'E';
-        for k=1:length(idx)
-            str = [str,'_',rxns{idx(k)}];
-        end
-        str = [str,cmps{i+sizeXmet+sizeYmet+sizeQuotaMet}];
-
-        enz{i} = str;
-        mets{i+sizeXmet+sizeYmet+sizeQuotaMet} = str;
-    end
 end
 
 %% collect everything into a structure
@@ -398,6 +375,7 @@ model.mets = model.mets([Xmet,storage,setdiff(Ymet,storage),quotaMet,enzMet]);
 model.metCompartments = model.metCompartments([Xmet,storage,setdiff(Ymet,storage),quotaMet,enzMet]);
 model.metNames = columnVector(metNames([Xmet,storage,setdiff(Ymet,storage),quotaMet,enzMet]));
 model.noRxn = length(model.rxns);
+
 
 model.tf = 1;
 
@@ -528,59 +506,4 @@ function xmlModel = getAnnotations(filename)
     xmlModel.rxns = rmfield(xmlModel.rxns,'Name');
     xmlModel.rxns = rmfield(xmlModel.rxns,'Data');
     xmlModel.rxns = rmfield(xmlModel.rxns,'Children');
-end
-
-function [idsMet,comps] = parseMetID(id)
-    idsMet = '';
-    comps = '';
-    [~,aux] = regexp(id,'(?<met>.+)_(?<comp3>.+)_(?<comp2>.+)_(?<comp1>.+)','tokens','names');
-     
-    if isempty(aux)
-       [~,aux] = regexp(id,'(?<met>.+)_(?<comp2>.+)_(?<comp1>.+)','tokens','names');
-    else
-        if isnan(str2double(aux.comp3))&&isnan(str2double(aux.comp2))
-            idsMet = [aux.met,'[',aux.comp3,']_[',aux.comp2,']_[',aux.comp1,']'];
-            comps = ['[',aux.comp3,']_[',aux.comp2,']_[',aux.comp1,']'];
-        elseif ~isnan(str2double(aux.comp3))&&isnan(str2double(aux.comp2))
-            idsMet = [aux.met,'_',aux.comp3,'[',aux.comp2,']_[',aux.comp1,']'];
-            comps = ['[',aux.comp2,']_[',aux.comp1,']'];
-        end
-    end
-    
-    if isempty(aux)
-        [~,aux] = regexp(id,'(?<met>.+)_(?<comp1>.+)','tokens','names');
-    else
-        if isempty(idsMet)
-            if isnan(str2double(aux.comp2))
-                idsMet = [aux.met,'[',aux.comp2,']_[',aux.comp1,']'];
-                comps = ['[',aux.comp2,']_[',aux.comp1,']'];
-            else
-                idsMet = [aux.met,'_',aux.comp2,'[',aux.comp1,']'];
-                comps = ['[',aux.comp1,']'];
-            end
-        end
-    end   
-    
-    if isempty(idsMet)
-        idsMet = [aux.met,'[',aux.comp1,']'];
-        comps = ['[',aux.comp1,']'];
-    end    
-end
-
-function str = formatID(str)
-str = strrep(str,'_DASH_','-');
-str = strrep(str,'_FSLASH_','/');
-str = strrep(str,'_BSLASH_','\');
-str = strrep(str,'_LPAREN_','(');
-str = strrep(str,'_RPAREN_',')');
-str = strrep(str,'_LSQBKT_','[');
-str = strrep(str,'_RSQBKT_',']');
-str = strrep(str,'_COMMA_',',');
-str = strrep(str,'_PERIOD_','.');
-str = strrep(str,'_APOS_','''');
-str = regexprep(str,'_e','\(e\)$');
-str = strrep(str,'&amp;','&');
-str = strrep(str,'&lt;','<');
-str = strrep(str,'&gt;','>');
-str = strrep(str,'&quot;','"');
 end

@@ -1,0 +1,1126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2" level="3" version="1" fbc:required="false">
+  <model metaid="deFBAmodel" id="deFBAmodel" fbc:strict="false">
+    <notes>
+      <body xmlns="http://www.w3.org/1999/xhtml">
+        <p/>
+      </body>
+    </notes>
+    <listOfUnitDefinitions>
+      <unitDefinition id="mmol_per_hr">
+        <listOfUnits>
+          <unit kind="mole" exponent="1" scale="-3" multiplier="1"/>
+          <unit kind="gram" exponent="-1" scale="0" multiplier="1"/>
+          <unit kind="second" exponent="-1" scale="0" multiplier="3600"/>
+        </listOfUnits>
+      </unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment id="c" name="cytosol" spatialDimensions="3" size="1" constant="true"/>
+      <compartment id="e" name="extracellular" spatialDimensions="3" size="1" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="A" name="A" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="B" name="B" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C" name="C" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="D" name="D" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="E" name="E" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="F" name="F" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="G" name="G" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="H" name="H" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="O2" name="O2" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="ATP" name="ATP" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="NADH" name="NADH" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="O2ext" name="O2ext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="true"/>
+      <species id="Carb1" name="Carb1" compartment="e" initialAmount="1000" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
+      <species id="Carb2" name="Carb2" compartment="e" initialAmount="1000" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
+      <species id="Dext" name="Dext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
+      <species id="Eext" name="Eext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
+      <species id="Fext" name="Fext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
+      <species id="Hext" name="Hext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
+      <species id="S" name="S" compartment="c" initialAmount="0.1" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="quota" ram:molecularWeight="weight_quota_1" ram:objectiveWeight="zero" ram:biomassPercentage="bioPercentage_1"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER1" name="ER1" compartment="c" initialAmount="0.00301777783514623" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_1" ram:objectiveWeight="weight_1" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER2" name="ER2" compartment="c" initialAmount="0.0053845218157917" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_2" ram:objectiveWeight="weight_2" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER3" name="ER3" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_3" ram:objectiveWeight="weight_3" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER4" name="ER4" compartment="c" initialAmount="0.00130388710295293" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_4" ram:objectiveWeight="weight_4" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER5" name="ER5" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_5" ram:objectiveWeight="weight_5" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER6" name="ER6" compartment="c" initialAmount="0.00119910306335673" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_6" ram:objectiveWeight="weight_6" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER7" name="ER7" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_7" ram:objectiveWeight="weight_7" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ER8" name="ER8" compartment="c" initialAmount="0.00101955237109491" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_8" ram:objectiveWeight="weight_8" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ERres" name="ERres" compartment="c" initialAmount="0.00235700262101268" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_9" ram:objectiveWeight="weight_9" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ETC1" name="ETC1" compartment="c" initialAmount="0.00323071308947502" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_10" ram:objectiveWeight="weight_10" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ETC2" name="ETC2" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_11" ram:objectiveWeight="weight_11" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ETD" name="ETD" compartment="c" initialAmount="0.00647515654212635" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_12" ram:objectiveWeight="weight_12" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ETE" name="ETE" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_13" ram:objectiveWeight="weight_13" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ETF" name="ETF" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_14" ram:objectiveWeight="weight_14" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ETH" name="ETH" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_15" ram:objectiveWeight="weight_15" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ETO" name="ETO" compartment="c" initialAmount="0.00424260471782283" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_16" ram:objectiveWeight="weight_16" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="RIB" name="RIB" compartment="c" initialAmount="0.0013519505041737" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_17" ram:objectiveWeight="weight_17" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="zero" value="0" constant="true"/>
+      <parameter id="bioPercentage_1" value="0.1" constant="true"/>
+      <parameter id="weight_quota_1" value="7.5" constant="true"/>
+      <parameter id="weight_1" value="5" constant="true"/>
+      <parameter id="weight_2" value="5" constant="true"/>
+      <parameter id="weight_3" value="20" constant="true"/>
+      <parameter id="weight_4" value="5" constant="true"/>
+      <parameter id="weight_5" value="5" constant="true"/>
+      <parameter id="weight_6" value="10" constant="true"/>
+      <parameter id="weight_7" value="10" constant="true"/>
+      <parameter id="weight_8" value="40" constant="true"/>
+      <parameter id="weight_9" value="5" constant="true"/>
+      <parameter id="weight_10" value="4" constant="true"/>
+      <parameter id="weight_11" value="15" constant="true"/>
+      <parameter id="weight_12" value="4" constant="true"/>
+      <parameter id="weight_13" value="4" constant="true"/>
+      <parameter id="weight_14" value="4" constant="true"/>
+      <parameter id="weight_15" value="4" constant="true"/>
+      <parameter id="weight_16" value="4" constant="true"/>
+      <parameter id="weight_17" value="60" constant="true"/>
+      <parameter id="kcat_1" value="1800" constant="true"/>
+      <parameter id="kcat_2" value="1800" constant="true"/>
+      <parameter id="kcat_3" value="1800" constant="true"/>
+      <parameter id="kcat_4" value="1800" constant="true"/>
+      <parameter id="kcat_5" value="1800" constant="true"/>
+      <parameter id="kcat_6" value="1800" constant="true"/>
+      <parameter id="kcat_7" value="1800" constant="true"/>
+      <parameter id="kcat_8" value="1800" constant="true"/>
+      <parameter id="kcat_9" value="1800" constant="true"/>
+      <parameter id="kcat_10" value="3000" constant="true"/>
+      <parameter id="kcat_11" value="2000" constant="true"/>
+      <parameter id="kcat_12" value="1000" constant="true"/>
+      <parameter id="kcat_13" value="1000" constant="true"/>
+      <parameter id="kcat_14" value="1000" constant="true"/>
+      <parameter id="kcat_15" value="3000" constant="true"/>
+      <parameter id="kcat_16" value="1000" constant="true"/>
+      <parameter id="kcat_17" value="2" constant="true"/>
+      <parameter id="kcat_18" value="2" constant="true"/>
+      <parameter id="kcat_19" value="0.5" constant="true"/>
+      <parameter id="kcat_20" value="2" constant="true"/>
+      <parameter id="kcat_21" value="2" constant="true"/>
+      <parameter id="kcat_22" value="1" constant="true"/>
+      <parameter id="kcat_23" value="1" constant="true"/>
+      <parameter id="kcat_24" value="0.25" constant="true"/>
+      <parameter id="kcat_25" value="2" constant="true"/>
+      <parameter id="kcat_26" value="2.5" constant="true"/>
+      <parameter id="kcat_27" value="0.67" constant="true"/>
+      <parameter id="kcat_28" value="2.5" constant="true"/>
+      <parameter id="kcat_29" value="2.5" constant="true"/>
+      <parameter id="kcat_30" value="2.5" constant="true"/>
+      <parameter id="kcat_31" value="2.5" constant="true"/>
+      <parameter id="kcat_32" value="2.5" constant="true"/>
+      <parameter id="kcat_33" value="3" constant="true"/>
+      <parameter id="kcat_34" value="0.2" constant="true"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="R1" name="R1" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_17" ram:objectiveWeight="weight_17" ram:biomassPercentage="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_1" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="A" stoichiometry="1" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="B" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_1">
+          <fbc:geneProductRef fbc:geneProduct="ER1"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R2" name="R2" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_1" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_2" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="B" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="C" stoichiometry="1" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="2" constant="true"/>
+          <speciesReference species="NADH" stoichiometry="2" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_2">
+          <fbc:geneProductRef fbc:geneProduct="ER2"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R3" name="R3" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_2" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_3" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="B" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="F" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_3">
+          <fbc:geneProductRef fbc:geneProduct="ER3"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R4" name="R4" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_3" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_4" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="C" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="G" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_4">
+          <fbc:geneProductRef fbc:geneProduct="ER4"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R5" name="R5" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_4" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_5" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="G" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="C" stoichiometry="0.8" constant="true"/>
+          <speciesReference species="NADH" stoichiometry="2" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_5">
+          <fbc:geneProductRef fbc:geneProduct="ER5"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R6" name="R6" reversible="true" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_5" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_6" ram:kcatBackward="kcat_6"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="C" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="D" stoichiometry="3" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="2" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_6">
+          <fbc:geneProductRef fbc:geneProduct="ER6"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R7" name="R7" reversible="true" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_6" ram:kcatBackward="kcat_6"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_7" ram:kcatBackward="kcat_7"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="C" stoichiometry="1" constant="true"/>
+          <speciesReference species="NADH" stoichiometry="4" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="E" stoichiometry="3" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_7">
+          <fbc:geneProductRef fbc:geneProduct="ER7"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R8" name="R8" reversible="true" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_7" ram:kcatBackward="kcat_7"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_8" ram:kcatBackward="kcat_8"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="G" stoichiometry="1" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1" constant="true"/>
+          <speciesReference species="NADH" stoichiometry="2" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="H" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_8">
+          <fbc:geneProductRef fbc:geneProduct="ER8"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="Rres" name="Rres" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_8" ram:kcatBackward="kcat_8"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_9" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="O2" stoichiometry="1" constant="true"/>
+          <speciesReference species="NADH" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ATP" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_9">
+          <fbc:geneProductRef fbc:geneProduct="ERres"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="TC1" name="TC1" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_9" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_10" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="Carb1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="A" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_10">
+          <fbc:geneProductRef fbc:geneProduct="ETC1"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="TC2" name="TC2" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_10" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_11" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="Carb2" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="A" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_11">
+          <fbc:geneProductRef fbc:geneProduct="ETC2"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="TD" name="TD" reversible="true" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_11" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_12" ram:kcatBackward="kcat_12"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="D" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="Dext" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_12">
+          <fbc:geneProductRef fbc:geneProduct="ETD"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="TE" name="TE" reversible="true" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_12" ram:kcatBackward="kcat_12"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_13" ram:kcatBackward="kcat_13"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="E" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="Eext" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_13">
+          <fbc:geneProductRef fbc:geneProduct="ETE"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="TF" name="TF" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_13" ram:kcatBackward="kcat_13"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_14" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="Fext" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="F" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_14">
+          <fbc:geneProductRef fbc:geneProduct="ETF"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="TH" name="TH" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_14" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_15" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="Hext" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_15">
+          <fbc:geneProductRef fbc:geneProduct="ETH"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="TO" name="TO" reversible="false" fast="true">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_15" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_16" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="O2ext" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="O2" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_16">
+          <fbc:geneProductRef fbc:geneProduct="ETO"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="Sprod" name="Sprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_16" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_17" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="C" stoichiometry="250" constant="true"/>
+          <speciesReference species="F" stoichiometry="250" constant="true"/>
+          <speciesReference species="H" stoichiometry="250" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1500" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="S" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_17">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER1prod" name="ER1prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_17" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_18" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="500" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="2000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_18">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER2prod" name="ER2prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_18" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_19" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="500" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="2000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER2" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_19">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER3prod" name="ER3prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_19" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_20" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="2000" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="8000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER3" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_20">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER4prod" name="ER4prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_20" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_21" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="500" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="2000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER4" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_21">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER5prod" name="ER5prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_21" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_22" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="500" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="2000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER5" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_22">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER6prod" name="ER6prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_22" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_23" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="1000" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="4000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER6" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_23">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER7prod" name="ER7prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_23" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_24" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="1000" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="4000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER7" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_24">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ER8prod" name="ER8prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_24" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_25" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="4000" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="16000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ER8" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_25">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ERresprod" name="ERresprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_25" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_26" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="500" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="2000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ERres" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_26">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ETC1prod" name="ETC1prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_26" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_27" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="400" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1600" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ETC1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_27">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ETC2prod" name="ETC2prod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_27" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_28" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="1500" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="6000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ETC2" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_28">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ETDprod" name="ETDprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_28" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_29" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="400" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1600" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ETD" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_29">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ETEprod" name="ETEprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_29" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_30" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="400" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1600" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ETE" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_30">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ETFprod" name="ETFprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_30" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_31" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="400" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1600" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ETF" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_31">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ETHprod" name="ETHprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_31" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_32" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="400" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1600" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ETH" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_32">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="ETOprod" name="ETOprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_32" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_33" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="H" stoichiometry="400" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="1600" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ETO" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_33">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="RIBprod" name="RIBprod" reversible="false" fast="false">
+        <notes>
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <annotation>
+              <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+                <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_33" ram:kcatBackward="zero"/>
+              </ram:RAM>
+            </annotation>
+          </body>
+        </notes>
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_34" ram:kcatBackward="zero"/>
+          </ram:RAM>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="C" stoichiometry="1500" constant="true"/>
+          <speciesReference species="H" stoichiometry="4500" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="21000" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="RIB" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation fbc:id="ga_34">
+          <fbc:geneProductRef fbc:geneProduct="RIB"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+    </listOfReactions>
+    <fbc:listOfGeneProducts>
+      <fbc:geneProduct fbc:id="ER1" fbc:label="ER1" fbc:associatedSpecies="ER1"/>
+      <fbc:geneProduct fbc:id="ER2" fbc:label="ER2" fbc:associatedSpecies="ER2"/>
+      <fbc:geneProduct fbc:id="ER3" fbc:label="ER3" fbc:associatedSpecies="ER3"/>
+      <fbc:geneProduct fbc:id="ER4" fbc:label="ER4" fbc:associatedSpecies="ER4"/>
+      <fbc:geneProduct fbc:id="ER5" fbc:label="ER5" fbc:associatedSpecies="ER5"/>
+      <fbc:geneProduct fbc:id="ER6" fbc:label="ER6" fbc:associatedSpecies="ER6"/>
+      <fbc:geneProduct fbc:id="ER7" fbc:label="ER7" fbc:associatedSpecies="ER7"/>
+      <fbc:geneProduct fbc:id="ER8" fbc:label="ER8" fbc:associatedSpecies="ER8"/>
+      <fbc:geneProduct fbc:id="ERres" fbc:label="ERres" fbc:associatedSpecies="ERres"/>
+      <fbc:geneProduct fbc:id="ETC1" fbc:label="ETC1" fbc:associatedSpecies="ETC1"/>
+      <fbc:geneProduct fbc:id="ETC2" fbc:label="ETC2" fbc:associatedSpecies="ETC2"/>
+      <fbc:geneProduct fbc:id="ETD" fbc:label="ETD" fbc:associatedSpecies="ETD"/>
+      <fbc:geneProduct fbc:id="ETE" fbc:label="ETE" fbc:associatedSpecies="ETE"/>
+      <fbc:geneProduct fbc:id="ETF" fbc:label="ETF" fbc:associatedSpecies="ETF"/>
+      <fbc:geneProduct fbc:id="ETH" fbc:label="ETH" fbc:associatedSpecies="ETH"/>
+      <fbc:geneProduct fbc:id="ETO" fbc:label="ETO" fbc:associatedSpecies="ETO"/>
+      <fbc:geneProduct fbc:id="RIB" fbc:label="RIB" fbc:associatedSpecies="RIB"/>
+    </fbc:listOfGeneProducts>
+  </model>
+</sbml>

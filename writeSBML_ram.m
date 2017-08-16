@@ -241,10 +241,6 @@ tmp_metCompartment = cell(length(model.mets),1);
 comps = cell(length(model.mets),1);
 idsMet = cell(length(model.mets),1);
 
-% for i=length(model.mets):-1:1
-%     [idsMet{i},comps{i},tmp_metCompartment{i}] = parseMetID(model.mets{i});
-% end
-
 sbmlModel.species=tmp_species;
 
 % already create parameter for zero
@@ -264,7 +260,10 @@ for i=1:length(model.mets)
         tmp_species.id = [idsMet{i},'_',comps{i}];        
         tmp_species.compartment = tmp_metCompartment{i};
     else
-        tmp_species.id = formatID(model.mets{i});
+        aux = formatID(model.mets{i});
+        aux = strrep(aux,'LSQBKT_','');
+        aux = strrep(aux,'_RSQBKT_','');
+        tmp_species.id = aux;
         tmp_species.compartment = model.metCompartments{i};
     end
     tmp_species.name = model.metNames{i};
