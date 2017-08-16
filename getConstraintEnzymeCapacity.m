@@ -83,9 +83,9 @@ function [Aineq,bineq] = getConstraintEnzymeCapacity(model)
                     idxv = getIndexVariable(model,'v',i,idxRxns(j));
                     % quota is not scaled by epsilon
                     if strcmp(model.rxns(idxRxns(j)),model.ProtQuotaProdID)
-                        Aineq(t,idxv) = 1/(model.epsilon*model.Kcat_f(idxRxns(j),end));
+                        Aineq(t,idxv) = 1/(model.epsilon*model.Kcat_f(idxRxns(j),l));
                     else
-                        Aineq(t,idxv) = 1/model.Kcat_f(idxRxns(j),end);
+                        Aineq(t,idxv) = 1/model.Kcat_f(idxRxns(j),l);
                     end
                 end
             else
