@@ -285,17 +285,26 @@ for i=1:length(model.mets)
     if i > model.sizeXmet+model.sizeYmet        
         if i <= model.sizeXmet+model.sizeYmet+model.sizeQuotaMet
             [~,idxQ] = ismember(tmp_species.name,model.metNames(model.sizeXmet+model.sizeYmet+1:model.sizeXmet+model.sizeYmet+model.sizeQuotaMet));
+            
             tmp_percBiomass = model.quotaInitial(idxQ);
-            tmp_parameter.id = sprintf('bioPercentage_%d',idxQ);
+            tmp_parameter.id = sprintf('bioPercentage_q_%d',idxQ);
             idP = tmp_parameter.id;
             tmp_parameter.value = tmp_percBiomass;
             sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
+            
             tmp_molWeight = model.quotaWeights(idxQ);
             tmp_parameter.id = sprintf('weight_quota_%d',idxQ);
             idW = tmp_parameter.id;
-            tmp_parameter.value = tmp_molWeight;
+            tmp_parameter.value = tmp_molWeight;           
             sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
-            tmp_note=sprintf('%s ram:speciesType="quota" ram:molecularWeight="%s" ram:objectiveWeight="zero" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,idW,idP);
+            
+            tmp_objWeight = model.objectiveWeights(i-(model.sizeXmet+model.sizeYmet));
+            tmp_parameter.id = sprintf('weight_objective_q_%d',idxQ);
+            idO = tmp_parameter.id;
+            tmp_parameter.value = tmp_objWeight;           
+            sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];            
+            
+            tmp_note=sprintf('%s ram:speciesType="quota" ram:molecularWeight="%s" ram:objectiveWeight="%s" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,idW,idO,idP);
             tmp_species.initialAmount = model.initialBiomass(b);
             b = b+1;
             
@@ -307,7 +316,20 @@ for i=1:length(model.mets)
             tmp_parameter.id = sprintf('weight_%d',idxP);
             tmp_parameter.value = tmp_molWeight;
             sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
-            tmp_note=sprintf('%s ram:speciesType="enzyme" ram:molecularWeight="%s" ram:objectiveWeight="%s" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id,tmp_parameter.id);
+            
+            tmp_objWeight = model.objectiveWeights(i-(model.sizeXmet+model.sizeYmet));
+            tmp_parameter.id = sprintf('weight_objective_p_%d',idxP);
+            idO = tmp_parameter.id;
+            tmp_parameter.value = tmp_objWeight;           
+            sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
+            
+            tmp_percBiomass = model.quotaInitial(i-(model.sizeXmet+model.sizeYmet));
+            tmp_parameter.id = sprintf('bioPercentage_p_%d',idxP);
+            idP = tmp_parameter.id;
+            tmp_parameter.value = tmp_percBiomass;
+            sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
+            
+            tmp_note=sprintf('%s ram:speciesType="enzyme" ram:molecularWeight="%s" ram:objectiveWeight="%s" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id,idO,idP);
             tmp_species.initialAmount = model.initialBiomass(b);
             b = b+1;
             

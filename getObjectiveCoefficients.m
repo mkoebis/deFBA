@@ -48,8 +48,14 @@ function c = getObjectiveCoefficients(model)
 % Alexandra Reimers 14/07/2017
 
     c = toVector(emptySolutionStruct(model),model);
-    for i=1:model.N
-        idx = getIndexVariable(model,'p',i,model.sizeQuotaMet+1:1:model.sizePmet);
-        c(idx) = model.proteinWeights*model.epsilon;
+    for i=1:model.N        
+        for j=1:model.sizePmet
+            idx = getIndexVariable(model,'p',i,j);
+            if (j>model.sizeQuotaMet)
+                c(idx) = model.objectiveWeights(j)*model.epsilon;
+            else
+                c(idx) = model.objectiveWeights(j);
+            end
+        end
     end
 end

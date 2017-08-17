@@ -124,6 +124,7 @@ noStorage = length(storage);
 quota_tmp = [xmlModel.mets([quotaMet,enzMet])];
 quotaInitial = zeros(1,sizePmet);
 quotaWeights = zeros(1,sizeQuotaMet);
+objectiveWeights = zeros(1,sizePmet);
 c = 0;
 for i=1:length(quota_tmp)
     for j=1:length(quota_tmp(i).annotation)
@@ -141,6 +142,13 @@ for i=1:length(quota_tmp)
                         c = c+1;
                         quotaWeights(c) = str2double(xmlModel.params(k).value);
                     end
+                end
+            end
+        end
+        if strcmp(quota_tmp(i).annotation(j).Name,'ram:objectiveWeight')
+            for k=1:length(xmlModel.params)
+                if strcmp(xmlModel.params(k).id,quota_tmp(i).annotation(j).Value)
+                    objectiveWeights(i) = str2double(xmlModel.params(k).value);
                 end
             end
         end
@@ -320,6 +328,7 @@ model.noStorage = noStorage;
 model.quotaInitial = quotaInitial;
 model.proteinWeights = proteinWeights;
 model.quotaWeights = quotaWeights;
+model.objectiveWeights = objectiveWeights;
 model.storageWeight = storageWeight;
 model.enz = enz;
 model.rev = rev;

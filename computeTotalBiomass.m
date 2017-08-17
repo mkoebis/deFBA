@@ -50,8 +50,14 @@ function b = computeTotalBiomass(result,model)
     strsol = toStruct(result,model);
     b = zeros(model.N,1);
     for i=1:model.N
-        b(i) = sum(strsol.p(i,1:model.sizeQuotaMet))*model.quotaWeights+...
-            model.proteinWeights'*strsol.p(i,model.sizeQuotaMet+1:end)'*model.epsilon+...
-            model.storageWeight*strsol.y(i,1:model.noStorage)';
+        b(i) = model.proteinWeights'*strsol.p(i,model.sizeQuotaMet+1:end)';
+        
+        if (model.sizeQuotaMet>0)
+            b(i) = b(i) + strsol.p(i,1:model.sizeQuotaMet)*model.quotaWeights;
+        end
+        
+        if (model.noStorage>0)
+            b(i) = b(i) + model.storageWeight*strsol.y(i,1:model.noStorage)';
+        end
     end
 end
