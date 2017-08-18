@@ -73,7 +73,7 @@ function [Aineq,bineq] = getConstraintBiomassCompositionIncludingEnzymes(model)
             
                     qidx = [1:1:j-1, j+1:1:length(model.quotaInitial)];
                     idx = getIndexVariable(model,'p',i,qidx);
-                    Aineq(t,idx) = weights(j)*model.quotaInitial(j);
+                    Aineq(t,idx) = weights(qidx)*model.quotaInitial(j);
 
                     idx = getIndexVariable(model,'p',i,model.sizeQuotaMet+1:1:model.sizePmet);
                     Aineq(t,idx) = Aineq(t,idx)*model.epsilon;

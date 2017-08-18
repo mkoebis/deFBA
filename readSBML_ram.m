@@ -105,7 +105,12 @@ for i = 1:nMets
                 elseif strcmp(xmlModel.mets(i).annotation(j).Value,'storage')
                     storage = [storage,i];
                 elseif strcmp(xmlModel.mets(i).annotation(j).Value,'quota')
-                    quotaMet = [quotaMet,i];
+                    % check for mislabeling
+                    if ismember(xmlModel.mets(i).id,{xmlModel.geneProd.associatedSpecies})
+                        enzMet = [enzMet,i];
+                    else                    
+                        quotaMet = [quotaMet,i];
+                    end
                 end
             end
         end
@@ -392,6 +397,10 @@ if exist('maintenanceID','var')
     model.maintenanceID = maintenanceID;
     model.maintenanceValue = maintenanceValue;
 end
+
+warning('Please set the ribosome ID in the field model.ribosomeID!')
+warning('If there is *noncatalytic* protein quota, please add the ID of the reaction that produces it in model.ProtQuotaProdID, else add an empty string in that field')
+
 
 end
 

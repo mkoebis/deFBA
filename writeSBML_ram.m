@@ -314,6 +314,7 @@ for i=1:length(model.mets)
             [~,idxP] = ismember(tmp_species.name,model.metNames(model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+1:model.sizeXmet+model.sizeYmet+model.sizePmet));
             tmp_molWeight = model.proteinWeights(idxP);
             tmp_parameter.id = sprintf('weight_%d',idxP);
+            idW = tmp_parameter.id;
             tmp_parameter.value = tmp_molWeight;
             sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
             
@@ -329,7 +330,7 @@ for i=1:length(model.mets)
             tmp_parameter.value = tmp_percBiomass;
             sbmlModel.parameter = [sbmlModel.parameter,tmp_parameter];
             
-            tmp_note=sprintf('%s ram:speciesType="enzyme" ram:molecularWeight="%s" ram:objectiveWeight="%s" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,tmp_parameter.id,idO,idP);
+            tmp_note=sprintf('%s ram:speciesType="enzyme" ram:molecularWeight="%s" ram:objectiveWeight="%s" ram:biomassPercentage="%s"/>\n</ram:RAM>\n</annotation>',tmp_noteBegin,idW,idO,idP);
             tmp_species.initialAmount = model.initialBiomass(b);
             b = b+1;
             
