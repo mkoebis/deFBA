@@ -270,6 +270,9 @@ for i=1:length(model.mets)
     tmp_species.name = model.metNames{i};
     % take care of nonlimiting extracellular metabolites
     if strcmp(tmp_species.compartment,externalCompID)
+        tmp_note = sprintf(['<annotation>\n<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n',...
+            '<ram:species ram:speciesType="extracellular"/>\n</ram:RAM>\n</annotation>']);
+        
         tmp_species.initialAmount = 0;
         tmp_species.constant = 1;
         tmp_species.boundaryCondition = 1;
@@ -354,9 +357,12 @@ for i=1:length(model.mets)
         else
             tmp_species.initialAmount = model.Y0(length(model.storageWeight)+c);
             tmp_species.constant = 0;
-            tmp_species.boundaryCondition = 1;
+            tmp_species.boundaryCondition = 0;
             c = c+1;
         end
+    elseif i <= model.sizeXmet
+        tmp_note = sprintf(['<annotation>\n<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n',...
+            '<ram:species ram:speciesType="metabolite"/>\n</ram:RAM>\n</annotation>']);
     end
     
     tmp_species.annotation = tmp_note;
@@ -639,7 +645,7 @@ function sbmlModel = initSBML(model)
         elseif strfind(list{i},'id')
             sbmlModel.(list{i})='deFBAmodel';
         elseif strfind(list{i},'note')
-                sbmlModel.(list{i})=['<body xmlns="http://www.w3.org/1999/xhtml"><p> </p></body>'];        
+                sbmlModel.(list{i})='<body xmlns="http://www.w3.org/1999/xhtml"><p>This model uses the RAM 1.0 specification.</p></body>';        
         elseif strfind(list{i},'sboTerm')
             sbmlModel.(list{i})=-1; 
         else
