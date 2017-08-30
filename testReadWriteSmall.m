@@ -6,6 +6,8 @@ model.sizeXmet = model.sizeXmet+1;
 model.S(12,16) = -1;
 model.genes = model.enz;
 model.rxnGeneMat = model.rxnEnzRules;
+model.objectiveWeights = [model.quotaWeights,model.proteinWeights];
+model2.objectiveWeights = model.objectiveWeights;
 
 % add compartments
 cyt = [1:1:model.sizeXmet,model.sizeXmet+model.sizeYmet+1:1:length(model.mets)];
