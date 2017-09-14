@@ -1,12 +1,11 @@
-function model = readSBML_ram(fileName,externalCompartmentID)
+function model = readSBML_ram(fileName)
 
 % readSBML_adjusted reads in a SBML model in ram format as a deFBA matlab structure
 %
 %
 %INPUTS
 % fileName                  File name for file to read in
-% externalCompartmentID     String containting the id of the external
-%                           metabolites compartment
+%
 %OUTPUT
 % model                     deFBA model structure with the fields:
 %   rxns                        cell array of all reaction IDs
@@ -83,6 +82,7 @@ rxns = cell(nRxns,1);
 mets = cell(nMets,1);
 metNames = cell(nMets,1);
 Ymet = [];
+Xmet = [];
 quotaMet = [];
 enzMet = [];
 storage = [];
@@ -90,13 +90,7 @@ storage = [];
 for i = 1:nMets
     mets{i} = speciesList{i};
     metNames{i} = tmpSpecies(i).name;
-    
-    if strcmp(tmpSpecies(i).compartment,externalCompartmentID)
-        if (tmpSpecies(i).boundaryCondition==1)
-            Ymet = [Ymet,i];
-        end
-    end
-    
+      
     if ~isempty(xmlModel.mets(i).annotation)
         for j=1:length(xmlModel.mets(i).annotation)
             if strcmp(xmlModel.mets(i).annotation(j).Name,'ram:speciesType')
@@ -111,13 +105,17 @@ for i = 1:nMets
                     else                    
                         quotaMet = [quotaMet,i];
                     end
+                elseif strcmp(xmlModel.mets(i).annotation(j).Value,'metabolite')
+                    Xmet = [Xmet,i];
+                elseif strcmp(xmlModel.mets(i).annotation(j).Value,'extracellular')
+                    if (tmpSpecies(i).boundaryCondition==0)
+                        Ymet = [Ymet,i];
+                    end
                 end
             end
         end
     end
 end
-
-Xmet =  setdiff(1:1:length(tmpSpecies),[Ymet,quotaMet,enzMet,storage]);
 
 sizeXmet = length(Xmet);
 sizePmet = length(quotaMet)+length(enzMet);
@@ -201,10 +199,12 @@ gprComp = cell(nRxns,1);
 fbcGeneIDs = {xmlModel.geneProd.id};
 for i = 1:nRxns
     %% read EC number
-    if isfield(xmlModel.rxns(i),'ec')
-        ecNumbers{i} = xmlModel.rxns(i).ec;
+    if isfield(modelSBML.reaction(i),'cvterms')
+        if ~isempty(modelSBML.reaction(i).cvterms)
+            ecNumbers{i} = parseIdentifiersLink(modelSBML.reaction(i).cvterms.resources);
+        end
     end
-
+    
     %% read the gene product association and at the same time build rxnEnzRules,enz,genes,rxnGeneMat    
     if ~isempty(xmlModel.rxns(i).geneProductAssociation) 
         % get associated species
@@ -297,12 +297,20 @@ for i=1:nRxns
     ann = {xmlModel.rxns(i).annotation.Name};
     idx = ismember(ann,'ram:kcatForward');
     p = ismember({xmlModel.params.id},xmlModel.rxns(i).annotation(idx).Value);
-    kplus = str2double(xmlModel.params(p).value);
+    if ~isempty(find(p))
+        kplus = str2double(xmlModel.params(p).value);
+    else
+        kplus = 0;
+    end
     
     
     idx = ismember(ann,'ram:kcatBackward');
     p = ismember({xmlModel.params.id},xmlModel.rxns(i).annotation(idx).Value);
-    kminus = str2double(xmlModel.params(p).value);
+    if ~isempty(find(p))
+        kminus = str2double(xmlModel.params(p).value);
+    else
+        kminus = 0;
+    end
     
     idx = ismember(ann,'ram:maintenanceScaling');
     p = ismember({xmlModel.params.id},xmlModel.rxns(i).annotation(idx).Value);
@@ -414,6 +422,11 @@ function vec = columnVector(vec)
     end
 end
 
+function ec = parseIdentifiersLink(link)
+    ec = regexp(link{1},'http://identifiers\.org/ec-code/(?<ec>.+)','names');
+    ec = ec.ec;
+end
+
 function xmlModel = getAnnotations(filename)
     xmlModel = parseXML(filename);
     ch = {xmlModel.Children.Name};       
@@ -480,12 +493,13 @@ function xmlModel = getAnnotations(filename)
         chld = {xmlModel.rxns(i).Children.Name};
         [~,idx] = ismember('annotation',chld);
         xmlModel.rxns(i).annotation = xmlModel.rxns(i).Children(idx);
-        
+              
         chld = {xmlModel.rxns(i).annotation.Children.Name};
-        xmlModel.rxns(i).annotation = xmlModel.rxns(i).annotation.Children(ismember(chld,'ram:RAM'));
+        xmlModel.rxns(i).annotation = xmlModel.rxns(i).annotation.Children(ismember(chld,'ram:RAM'));       
         
         chld = {xmlModel.rxns(i).annotation.Children.Name};
         xmlModel.rxns(i).annotation = xmlModel.rxns(i).annotation.Children(ismember(chld,'ram:reaction')).Attributes;
+                
         
         chld = {xmlModel.rxns(i).Children.Name};
         [~,idx] = ismember('fbc:geneProductAssociation',chld);
@@ -500,14 +514,7 @@ function xmlModel = getAnnotations(filename)
             [~,idx] = ismember('fbc:geneProductRef',chld);
             xmlModel.rxns(i).geneProductAssociation = xmlModel.rxns(i).geneProductAssociation.Children(idx).Attributes.Value;
         end
-        
-        
-        [idx] = ismember(chld,'notes');
-        if any(idx~=0)
-            ec = xmlModel.rxns(i).Children(idx).Children(2).Children(2).Children.Data;
-            xmlModel.rxns(i).ec = regexprep(strrep(ec,'EC Number:',''),'^(\s)+','');
-        end
-        
+               
         xmlModel.rxns(i).Children = xmlModel.rxns(i).Children(2:2:end);
     end
     

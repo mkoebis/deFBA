@@ -271,7 +271,7 @@ for i=1:length(model.mets)
     % take care of nonlimiting extracellular metabolites
     if strcmp(tmp_species.compartment,externalCompID)
         tmp_note = sprintf(['<annotation>\n<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n',...
-            '<ram:species ram:speciesType="extracellular"/>\n</ram:RAM>\n</annotation>']);
+            '<ram:species ram:speciesType="extracellular" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>']);
         
         tmp_species.initialAmount = 0;
         tmp_species.constant = 1;
@@ -360,9 +360,9 @@ for i=1:length(model.mets)
             tmp_species.boundaryCondition = 0;
             c = c+1;
         end
-    elseif i <= model.sizeXmet
+    elseif i <= model.sizeXmet && ~strcmp(tmp_species.compartment,externalCompID)
         tmp_note = sprintf(['<annotation>\n<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n',...
-            '<ram:species ram:speciesType="metabolite"/>\n</ram:RAM>\n</annotation>']);
+            '<ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>\n</ram:RAM>\n</annotation>']);
     end
     
     tmp_species.annotation = tmp_note;
@@ -478,7 +478,7 @@ for i=1:size(model.rxns, 1)
     isMaintenance = strcmp(model.rxns{i},model.maintenanceID);
     tmp_note = sprintf('<ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">\n<ram:reaction');
     if isMaintenance
-        tmp_note = sprintf('%s ram:maintenanceScaling="maintenancePercentage" ram:kcatForward="zero" ram:kcatBackward="zero"/>\n</ram:RAM>\n',tmp_note);
+        tmp_note = sprintf('%s ram:maintenanceScaling="maintenancePercentage" ram:kcatForward="" ram:kcatBackward=""/>\n</ram:RAM>\n',tmp_note);
     else
         % add kcat to list of parameters and then link
         if model.spontaneousRxn(i)==0
@@ -492,7 +492,7 @@ for i=1:size(model.rxns, 1)
                 tmp_note = sprintf('%s ram:maintenanceScaling="zero" ram:kcatForward="%s" ram:kcatBackward="zero"/>\n</ram:RAM>',tmp_note,tmp_parameter.id);
             end
         else
-            tmp_note = sprintf('%s ram:maintenanceScaling="zero" ram:kcatForward="zero" ram:kcatBackward="zero"/>\n</ram:RAM>',tmp_note);
+            tmp_note = sprintf('%s ram:maintenanceScaling="zero" ram:kcatForward="" ram:kcatBackward=""/>\n</ram:RAM>',tmp_note);
         end
     end
     t.annotation = tmp_note;
