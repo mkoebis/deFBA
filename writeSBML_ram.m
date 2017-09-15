@@ -400,19 +400,15 @@ sbmlModel.fbc_geneProduct = tmp_fbc_geneProduct;
 
 %% add gene products with correct stoichiometry
 geneProductRxn = cell(length(model.rxns),1);
-if isfield(model,'gprComp')
-    t = 1;
-    for i=1:length(model.gprComp)
-        % find index of corresponding enzyme in the model
-        idx = find(model.rxnEnzRules(i,:));
-        % find index of corresponding enzyme in sbml
-        idx = model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+idx;        
-        idx2 = find(model.rxnEnzRules(i,:));            
-  
-        if ~isempty(idx)
-            geneProductRxn{i} = sbmlModel.species(idx).id;
-        end        
-    end
+for i=1:length(model.rxns)
+    % find index of corresponding enzyme in the model
+    idx = find(model.rxnEnzRules(i,:));
+    % find index of corresponding enzyme in sbml
+    idx = model.sizeXmet+model.sizeYmet+model.sizeQuotaMet+idx;                  
+
+    if ~isempty(idx)
+        geneProductRxn{i} = sbmlModel.species(idx).id;
+    end        
 end
 
 gprIdx = true(length(geneProductRxn),1);
@@ -422,7 +418,14 @@ for i=1:length(geneProductRxn)
     end
 end
 geneProductRxnOrig = geneProductRxn;
-gprComp = model.gprComp(gprIdx);
+if isfield(model,'gprComp')
+    gprComp = model.gprComp(gprIdx);
+else
+    gprComp = cell(length(geneProductRxn),1);
+    for i=1:length(geneProductRxn)
+        gprComp{i} = ['1*',geneProductRxn{i}];
+    end
+end
 geneProductRxn = geneProductRxn(gprIdx);
 [geneProductRxn,idxUnique,~] = unique(geneProductRxn);
 

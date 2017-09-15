@@ -3,9 +3,25 @@
   <model metaid="deFBAmodel" id="deFBAmodel" fbc:strict="false">
     <notes>
       <body xmlns="http://www.w3.org/1999/xhtml">
-        <p/>
+        <p>This model uses the RAM 1.0 specification.</p>
       </body>
     </notes>
+    <annotation>
+      <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
+        <rdf:Description rdf:about="#deFBAmodel">
+          <dcterms:creator rdf:parseType="Resource">
+            <vCard:N rdf:parseType="Resource">
+              <vCard:Family>Reimers</vCard:Family>
+              <vCard:Given>Alexandra-M.</vCard:Given>
+            </vCard:N>
+            <vCard:EMAIL>alexandra.reimers@fu-berlin.de</vCard:EMAIL>
+            <vCard:ORG>
+              <vCard:Orgname>Freie Universitaet Berlin</vCard:Orgname>
+            </vCard:ORG>
+          </dcterms:creator>
+        </rdf:Description>
+      </rdf:RDF>
+    </annotation>
     <listOfUnitDefinitions>
       <unitDefinition id="mmol_per_hr">
         <listOfUnits>
@@ -16,148 +32,249 @@
       </unitDefinition>
     </listOfUnitDefinitions>
     <listOfCompartments>
-      <compartment id="c" name="cytosol" spatialDimensions="3" size="1" constant="true"/>
-      <compartment id="e" name="extracellular" spatialDimensions="3" size="1" constant="true"/>
+      <compartment id="cytosol" name="cytosol" spatialDimensions="3" size="1" constant="true"/>
+      <compartment id="external" name="external" spatialDimensions="3" size="1" constant="true"/>
     </listOfCompartments>
     <listOfSpecies>
-      <species id="A" name="A" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="B" name="B" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="C" name="C" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="D" name="D" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="E" name="E" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="F" name="F" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="G" name="G" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="H" name="H" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="O2" name="O2" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="ATP" name="ATP" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="NADH" name="NADH" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="O2ext" name="O2ext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="true"/>
-      <species id="Carb1" name="Carb1" compartment="e" initialAmount="1000" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="Carb2" name="Carb2" compartment="e" initialAmount="1000" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="Dext" name="Dext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="Eext" name="Eext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="Fext" name="Fext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="Hext" name="Hext" compartment="e" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="S" name="S" compartment="c" initialAmount="0.1" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="A" name="A" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="B" name="B" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="C" name="C" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="D" name="D" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="E" name="E" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="F" name="F" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="G" name="G" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="H" name="H" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="O2" name="O2" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="ATP" name="ATP" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="NADH" name="NADH" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="metabolite" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="Carb1" name="Carb1" compartment="external" initialAmount="1000" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="extracellular" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="Carb2" name="Carb2" compartment="external" initialAmount="1000" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="extracellular" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="Dext" name="Dext" compartment="external" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="extracellular" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="Eext" name="Eext" compartment="external" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="extracellular" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="Fext" name="Fext" compartment="external" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="extracellular" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="Hext" name="Hext" compartment="external" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
+        <annotation>
+          <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
+            <ram:species ram:speciesType="extracellular" ram:molecularWeight="" ram:objectiveWeight="zero" ram:biomassPercentage="zero"/>
+          </ram:RAM>
+        </annotation>
+      </species>
+      <species id="S" name="S" compartment="cytosol" initialAmount="0.1" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="quota" ram:molecularWeight="weight_quota_1" ram:objectiveWeight="weight_objective_q_1" ram:biomassPercentage="bioPercentage_q_1"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER1" name="ER1" compartment="c" initialAmount="0.00299585144431473" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER1" name="ER1" compartment="cytosol" initialAmount="0.00273939706165592" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_1" ram:objectiveWeight="weight_objective_p_1" ram:biomassPercentage="bioPercentage_p_1"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER2" name="ER2" compartment="c" initialAmount="0.00538841826264085" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER2" name="ER2" compartment="cytosol" initialAmount="0.00612111099694202" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_2" ram:objectiveWeight="weight_objective_p_2" ram:biomassPercentage="bioPercentage_p_2"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER3" name="ER3" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER3" name="ER3" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_3" ram:objectiveWeight="weight_objective_p_3" ram:biomassPercentage="bioPercentage_p_3"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER4" name="ER4" compartment="c" initialAmount="0.00156392047409526" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER4" name="ER4" compartment="cytosol" initialAmount="0.00153647422817498" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_4" ram:objectiveWeight="weight_objective_p_4" ram:biomassPercentage="bioPercentage_p_4"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER5" name="ER5" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER5" name="ER5" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_5" ram:objectiveWeight="weight_objective_p_5" ram:biomassPercentage="bioPercentage_p_5"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER6" name="ER6" compartment="c" initialAmount="0.00116141750620326" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER6" name="ER6" compartment="cytosol" initialAmount="0.0011790530062192" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_6" ram:objectiveWeight="weight_objective_p_6" ram:biomassPercentage="bioPercentage_p_6"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER7" name="ER7" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER7" name="ER7" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_7" ram:objectiveWeight="weight_objective_p_7" ram:biomassPercentage="bioPercentage_p_7"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ER8" name="ER8" compartment="c" initialAmount="0.0010193716932842" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ER8" name="ER8" compartment="cytosol" initialAmount="0.00100046495964834" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_8" ram:objectiveWeight="weight_objective_p_8" ram:biomassPercentage="bioPercentage_p_8"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ERres" name="ERres" compartment="c" initialAmount="0.00235660754384092" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ERres" name="ERres" compartment="cytosol" initialAmount="0.00231343277775638" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_9" ram:objectiveWeight="weight_objective_p_9" ram:biomassPercentage="bioPercentage_p_9"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ETC1" name="ETC1" compartment="c" initialAmount="0.00323305095758451" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ETC1" name="ETC1" compartment="cytosol" initialAmount="0.00324184546539071" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_10" ram:objectiveWeight="weight_objective_p_10" ram:biomassPercentage="bioPercentage_p_10"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ETC2" name="ETC2" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ETC2" name="ETC2" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_11" ram:objectiveWeight="weight_objective_p_11" ram:biomassPercentage="bioPercentage_p_11"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ETD" name="ETD" compartment="c" initialAmount="0.00627165453349761" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ETD" name="ETD" compartment="cytosol" initialAmount="0.0063668862335837" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_12" ram:objectiveWeight="weight_objective_p_12" ram:biomassPercentage="bioPercentage_p_12"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ETE" name="ETE" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ETE" name="ETE" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_13" ram:objectiveWeight="weight_objective_p_13" ram:biomassPercentage="bioPercentage_p_13"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ETF" name="ETF" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ETF" name="ETF" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_14" ram:objectiveWeight="weight_objective_p_14" ram:biomassPercentage="bioPercentage_p_14"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ETH" name="ETH" compartment="c" initialAmount="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ETH" name="ETH" compartment="cytosol" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_15" ram:objectiveWeight="weight_objective_p_15" ram:biomassPercentage="bioPercentage_p_15"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="ETO" name="ETO" compartment="c" initialAmount="0.00424189357891366" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="ETO" name="ETO" compartment="cytosol" initialAmount="0.00416417899996148" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_16" ram:objectiveWeight="weight_objective_p_16" ram:biomassPercentage="bioPercentage_p_16"/>
           </ram:RAM>
         </annotation>
       </species>
-      <species id="RIB" name="RIB" compartment="c" initialAmount="0.00135167620503596" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false">
+      <species id="RIB" name="RIB" compartment="cytosol" initialAmount="0.00132578589055807" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:species ram:speciesType="enzyme" ram:molecularWeight="weight_17" ram:objectiveWeight="weight_objective_p_17" ram:biomassPercentage="bioPercentage_p_17"/>
@@ -169,7 +286,7 @@
       <parameter id="zero" value="0" constant="true"/>
       <parameter id="bioPercentage_q_1" value="0.1" constant="true"/>
       <parameter id="weight_quota_1" value="7.5" constant="true"/>
-      <parameter id="weight_objective_q_1" value="7.5" constant="true"/>
+      <parameter id="weight_objective_q_1" value="0" constant="true"/>
       <parameter id="weight_1" value="5" constant="true"/>
       <parameter id="weight_objective_p_1" value="5" constant="true"/>
       <parameter id="bioPercentage_p_1" value="0" constant="true"/>
@@ -257,7 +374,7 @@
       <parameter id="kcat_34" value="0.2" constant="true"/>
     </listOfParameters>
     <listOfReactions>
-      <reaction id="R1" name="R1" reversible="false" fast="true">
+      <reaction id="R1" name="R1" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_1" ram:kcatBackward="zero"/>
@@ -274,7 +391,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER1"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="R2" name="R2" reversible="false" fast="true">
+      <reaction id="R2" name="R2" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_2" ram:kcatBackward="zero"/>
@@ -292,7 +409,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER2"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="R3" name="R3" reversible="false" fast="true">
+      <reaction id="R3" name="R3" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_3" ram:kcatBackward="zero"/>
@@ -308,7 +425,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER3"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="R4" name="R4" reversible="false" fast="true">
+      <reaction id="R4" name="R4" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_4" ram:kcatBackward="zero"/>
@@ -324,7 +441,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER4"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="R5" name="R5" reversible="false" fast="true">
+      <reaction id="R5" name="R5" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_5" ram:kcatBackward="zero"/>
@@ -341,7 +458,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER5"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="R6" name="R6" reversible="true" fast="true">
+      <reaction id="R6" name="R6" reversible="true" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_6" ram:kcatBackward="kcat_6"/>
@@ -358,7 +475,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER6"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="R7" name="R7" reversible="true" fast="true">
+      <reaction id="R7" name="R7" reversible="true" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_7" ram:kcatBackward="kcat_7"/>
@@ -375,7 +492,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER7"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="R8" name="R8" reversible="true" fast="true">
+      <reaction id="R8" name="R8" reversible="true" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_8" ram:kcatBackward="kcat_8"/>
@@ -393,7 +510,7 @@
           <fbc:geneProductRef fbc:geneProduct="ER8"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="Rres" name="Rres" reversible="false" fast="true">
+      <reaction id="Rres" name="Rres" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_9" ram:kcatBackward="zero"/>
@@ -410,7 +527,7 @@
           <fbc:geneProductRef fbc:geneProduct="ERres"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="TC1" name="TC1" reversible="false" fast="true">
+      <reaction id="TC1" name="TC1" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_10" ram:kcatBackward="zero"/>
@@ -426,7 +543,7 @@
           <fbc:geneProductRef fbc:geneProduct="ETC1"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="TC2" name="TC2" reversible="false" fast="true">
+      <reaction id="TC2" name="TC2" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_11" ram:kcatBackward="zero"/>
@@ -442,7 +559,7 @@
           <fbc:geneProductRef fbc:geneProduct="ETC2"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="TD" name="TD" reversible="true" fast="true">
+      <reaction id="TD" name="TD" reversible="true" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_12" ram:kcatBackward="kcat_12"/>
@@ -458,7 +575,7 @@
           <fbc:geneProductRef fbc:geneProduct="ETD"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="TE" name="TE" reversible="true" fast="true">
+      <reaction id="TE" name="TE" reversible="true" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_13" ram:kcatBackward="kcat_13"/>
@@ -474,7 +591,7 @@
           <fbc:geneProductRef fbc:geneProduct="ETE"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="TF" name="TF" reversible="false" fast="true">
+      <reaction id="TF" name="TF" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_14" ram:kcatBackward="zero"/>
@@ -490,7 +607,7 @@
           <fbc:geneProductRef fbc:geneProduct="ETF"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="TH" name="TH" reversible="false" fast="true">
+      <reaction id="TH" name="TH" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_15" ram:kcatBackward="zero"/>
@@ -506,15 +623,12 @@
           <fbc:geneProductRef fbc:geneProduct="ETH"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction id="TO" name="TO" reversible="false" fast="true">
+      <reaction id="TO" name="TO" reversible="false" fast="false">
         <annotation>
           <ram:RAM xmlns:ram="https://www.fairdomhub.org/sops/304">
             <ram:reaction ram:maintenanceScaling="zero" ram:kcatForward="kcat_16" ram:kcatBackward="zero"/>
           </ram:RAM>
         </annotation>
-        <listOfReactants>
-          <speciesReference species="O2ext" stoichiometry="1" constant="true"/>
-        </listOfReactants>
         <listOfProducts>
           <speciesReference species="O2" stoichiometry="1" constant="true"/>
         </listOfProducts>
@@ -833,23 +947,23 @@
       </reaction>
     </listOfReactions>
     <fbc:listOfGeneProducts>
-      <fbc:geneProduct fbc:id="ER1" fbc:label="ER1" fbc:associatedSpecies="ER1"/>
-      <fbc:geneProduct fbc:id="ER2" fbc:label="ER2" fbc:associatedSpecies="ER2"/>
-      <fbc:geneProduct fbc:id="ER3" fbc:label="ER3" fbc:associatedSpecies="ER3"/>
-      <fbc:geneProduct fbc:id="ER4" fbc:label="ER4" fbc:associatedSpecies="ER4"/>
-      <fbc:geneProduct fbc:id="ER5" fbc:label="ER5" fbc:associatedSpecies="ER5"/>
-      <fbc:geneProduct fbc:id="ER6" fbc:label="ER6" fbc:associatedSpecies="ER6"/>
-      <fbc:geneProduct fbc:id="ER7" fbc:label="ER7" fbc:associatedSpecies="ER7"/>
-      <fbc:geneProduct fbc:id="ER8" fbc:label="ER8" fbc:associatedSpecies="ER8"/>
-      <fbc:geneProduct fbc:id="ERres" fbc:label="ERres" fbc:associatedSpecies="ERres"/>
-      <fbc:geneProduct fbc:id="ETC1" fbc:label="ETC1" fbc:associatedSpecies="ETC1"/>
-      <fbc:geneProduct fbc:id="ETC2" fbc:label="ETC2" fbc:associatedSpecies="ETC2"/>
-      <fbc:geneProduct fbc:id="ETD" fbc:label="ETD" fbc:associatedSpecies="ETD"/>
-      <fbc:geneProduct fbc:id="ETE" fbc:label="ETE" fbc:associatedSpecies="ETE"/>
-      <fbc:geneProduct fbc:id="ETF" fbc:label="ETF" fbc:associatedSpecies="ETF"/>
-      <fbc:geneProduct fbc:id="ETH" fbc:label="ETH" fbc:associatedSpecies="ETH"/>
-      <fbc:geneProduct fbc:id="ETO" fbc:label="ETO" fbc:associatedSpecies="ETO"/>
-      <fbc:geneProduct fbc:id="RIB" fbc:label="RIB" fbc:associatedSpecies="RIB"/>
+      <fbc:geneProduct fbc:id="ER1" fbc:label="1*ER1" fbc:associatedSpecies="ER1"/>
+      <fbc:geneProduct fbc:id="ER2" fbc:label="1*ER2" fbc:associatedSpecies="ER2"/>
+      <fbc:geneProduct fbc:id="ER3" fbc:label="1*ER3" fbc:associatedSpecies="ER3"/>
+      <fbc:geneProduct fbc:id="ER4" fbc:label="1*ER4" fbc:associatedSpecies="ER4"/>
+      <fbc:geneProduct fbc:id="ER5" fbc:label="1*ER5" fbc:associatedSpecies="ER5"/>
+      <fbc:geneProduct fbc:id="ER6" fbc:label="1*ER6" fbc:associatedSpecies="ER6"/>
+      <fbc:geneProduct fbc:id="ER7" fbc:label="1*ER7" fbc:associatedSpecies="ER7"/>
+      <fbc:geneProduct fbc:id="ER8" fbc:label="1*ER8" fbc:associatedSpecies="ER8"/>
+      <fbc:geneProduct fbc:id="ERres" fbc:label="1*ERres" fbc:associatedSpecies="ERres"/>
+      <fbc:geneProduct fbc:id="ETC1" fbc:label="1*ETC1" fbc:associatedSpecies="ETC1"/>
+      <fbc:geneProduct fbc:id="ETC2" fbc:label="1*ETC2" fbc:associatedSpecies="ETC2"/>
+      <fbc:geneProduct fbc:id="ETD" fbc:label="1*ETD" fbc:associatedSpecies="ETD"/>
+      <fbc:geneProduct fbc:id="ETE" fbc:label="1*ETE" fbc:associatedSpecies="ETE"/>
+      <fbc:geneProduct fbc:id="ETF" fbc:label="1*ETF" fbc:associatedSpecies="ETF"/>
+      <fbc:geneProduct fbc:id="ETH" fbc:label="1*ETH" fbc:associatedSpecies="ETH"/>
+      <fbc:geneProduct fbc:id="ETO" fbc:label="1*ETO" fbc:associatedSpecies="ETO"/>
+      <fbc:geneProduct fbc:id="RIB" fbc:label="1*RIB" fbc:associatedSpecies="RIB"/>
     </fbc:listOfGeneProducts>
   </model>
 </sbml>
