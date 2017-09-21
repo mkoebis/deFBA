@@ -1,6 +1,8 @@
 function model = readSBML_ram(fileName)
 
 % readSBML_adjusted reads in a SBML model in ram format as a deFBA matlab structure
+% This function assumes the RAM annotation format for SBML encoding, see description at:
+% https://www.fairdomhub.org/sops/304
 %
 %
 %INPUTS

@@ -1,6 +1,8 @@
 function sbmlModel = writeSBML_ram(model,fileName,compSymbolList,compNameList,externalCompID)
 
 % writeSBML_ram exports a deFBA model structure into an SBML FBCv2 file using the ram standard
+% This function assumes the RAM annotation format for SBML encoding, see description at:
+% https://www.fairdomhub.org/sops/304
 %
 %INPUTS
 % model             deFBA model structure with the fields:
