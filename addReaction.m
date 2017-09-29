@@ -75,6 +75,14 @@ else
     model.rev(rxnID,1) = 0;
 end
 
+if revFlag
+    model.lb(rxnID,1) = -1000;
+    model.ub(rxnID,1) = 1000;
+else
+    model.lb(rxnID,1) = 0;
+    model.ub(rxnID,1) = 1000;
+end
+
 if (isfield(model,'rxnNames'))
     if exist('rxnNameFull','var')
         model.rxnNames{rxnID,1} = rxnNameFull;

@@ -30,6 +30,8 @@ function modelOut = removeRxns(model,rxnRemoveList)
     modelOut.S = model.S(:,selectRxns);
     modelOut.rxns = model.rxns(selectRxns);
     modelOut.rev = model.rev(selectRxns);
+    modelOut.lb = model.lb(selectRxns);
+    modelOut.ub = model.ub(selectRxns);
     
     if (isfield(model,'genes'))
         modelOut.genes = model.genes;

@@ -27,9 +27,10 @@ function newModel = duplicateOrRxns(model)
             newModel = addReaction(newModel,{rxnID,rxnName},...
                 model.mets(model.S(:,idx(i))~=0),...
                 model.S(model.S(:,idx(i))~=0,idx(i)),...
-                model.rev(idx(i)), mysplit{j});              
+                model.rev(idx(i))==1, mysplit{j});              
         end
-        
+        i
+        model.rxns(idx(i))
         % remove original reaction since now we have the replacements
         newModel = removeRxns(newModel,model.rxns(idx(i)));      
     end

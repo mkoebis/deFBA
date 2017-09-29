@@ -5,7 +5,6 @@ function newModel = formulateBiomassYeast(model,aaFilename)
     AAcounts = M.data;
     % of these consider only metabolic genes
     idx = ismember(geneNames,model.genes);
-    %geneNames = geneNames(idx);
     AAcounts = AAcounts(idx,:);
     geneNames = geneNames(idx);
     
@@ -14,11 +13,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
     T = T(:,1:4);
     T.Properties.VariableNames = {'rxns','rxnNames','geneAssoc','stoichiometry'};
     
-    %% get ribosome composition
-    Tgenes = readtable('yeastRibosomalGenes.csv','ReadVariableNames',false);
-    Tgenes = table2cell(Tgenes);
-%     model = addGenes(model,Tgenes);
-%     geneAssocRib = strjoin(Tgenes,' AND ');
+    %% ribosome composition
     geneAssocRib = 'YGR214W AND YLR048W AND YGL123W AND YNL178W AND YLR441C AND YML063W AND YJR145C AND YHR203C AND YJR123W AND YPL090C AND YBR181C AND YOR096W AND YNL096C AND YBL072C AND YER102W AND YPL081W AND YBR189W AND YOR293W AND YMR230W AND YDR025W AND YBR048W AND YOR369C AND YDR064W AND YCR031C AND YJL191W AND YOL040C AND YJL190C AND YLR367W AND YMR143W AND YDL083C AND YML024W AND YDR447C AND YDR450W AND YML026C AND YOL121C AND YNL302C AND YHL015W AND YKR057W AND YJL136C AND YGR118W AND YPR132W AND YER074W AND YIL069C AND YGR027C AND YLR333C AND YGL189C AND YER131W AND YKL156W AND YHR021C AND YLR167W AND YOR167C AND YLR264W AND YLR388W AND YDL061C AND YLR287C-A AND YOR182C AND YOR063W AND YBR031W AND YDR012W AND YPL131W AND YML073C AND YLR448W AND YGL076C AND YPL198W AND YHL033C AND YLL045C AND YFR031C-A AND YIL018W AND YGL147C AND YNL067W AND YLR075W AND YPL220W AND YGL135W AND YPR102C AND YGR085C AND YEL054C AND YDR418W AND YDL082W AND YMR142C AND YIL133C AND YNL069C AND YKL006W AND YHL001W AND YLR029C AND YMR121C AND YKL180W AND YJL177W AND YOL120C AND YNL301C AND YMR242C AND YOR312C AND YBR084C-A AND YBL027W AND YBR191W AND YPL079W AND YLR061W AND YFL034C-A AND YBL087C AND YER117W AND YOL127W AND YGL031C AND YGR148C AND YLR344W AND YGR034W AND YHR010W AND YDR471W AND YGL103W AND YFR032C-A AND YGL030W AND YDL075W AND YLR406C AND YBL092W AND YER056C-A AND YIL052C AND YDL191W AND YDL136W AND YPL143W AND YOR234C AND YMR194W AND YPL249C-A AND YNL162W AND YHR141C AND YLR185W AND YDR500C AND YPR043W AND YJR094W-A AND YLR325C AND YJL189W AND YIL148W AND YKR094C AND YDL184C AND YDL133C-A AND YLR340W AND YDL081C AND YDL130W AND YOL039W';
     %% set molecular weight of amino acids [kDa]
     % useful for the weighted sum of p0 and thus for computing proteinWeights
@@ -45,7 +40,6 @@ function newModel = formulateBiomassYeast(model,aaFilename)
     newModel.rxnEnzRules = sparse(nrxnNew,nenzNew);
     newModel.enz = {};
 	newModel.enzLength = zeros(1,nenzNew);
-%     newModel.enzGeneAssoc = cell(nenzNew,1);
     newModel.proteinWeights = zeros(nenzNew,1);
     
     uniqueGeneAssoc = unique(geneCombs);  
@@ -56,7 +50,6 @@ function newModel = formulateBiomassYeast(model,aaFilename)
         genesInvolved = strsplit(uniqueGeneAssoc{i},' AND ');
         rxnsCatalysed = false(length(newModel.rxns),1);
         for jj = 1:length(newModel.rxns)
-%             rxnsCatalysed(jj) = ~isempty(strfind(newModel.grRules{jj},uniqueGeneAssoc{i}));
             rxnsCatalysed(jj) = strcmp(newModel.grRules{jj},uniqueGeneAssoc{i});
         end
         rxnsCatalysedNames = newModel.rxns(rxnsCatalysed);
@@ -83,11 +76,9 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             newModel.spontaneousRxn = [newModel.spontaneousRxn;0];
             % set rxn-enzyme association
             aux = aux + 1;
-            %assert(length(newModel.rxns)==aux+length(model.rxns))
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0451'),aux) = 1;
             newModel.enz{length(newModel.enz)+1} = enzName;
             newModel.enzLength(aux) = sum(aa);
-            %newModel.enzGeneAssoc{length(newModel.enz)} = strjoin(model.genes(genesInvolved));
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             enzName = 'E_r_0452[c03]';
@@ -107,11 +98,9 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             newModel.spontaneousRxn = [newModel.spontaneousRxn;0];
             % set rxn-enzyme association
             aux = aux + 1;
-            %assert(length(newModel.rxns)==aux+length(model.rxns))
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0452'),aux) = 1;
             newModel.enz{length(newModel.enz)+1} = enzName;
             newModel.enzLength(aux) = sum(aa);
-            %newModel.enzGeneAssoc{length(newModel.enz)} = strjoin(model.genes(genesInvolved));
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
         elseif ismember('r_0492',rxnsCatalysedNames)
             enzName = 'E_r_0491_1[c03]';
@@ -132,11 +121,9 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             newModel.spontaneousRxn = [newModel.spontaneousRxn;0];
             % set rxn-enzyme association
             aux = aux + 1;
-            %assert(length(newModel.rxns)==aux+length(model.rxns))
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0491_1'),aux) = 1;
             newModel.enz{length(newModel.enz)+1} = enzName;
             newModel.enzLength(aux) = sum(aa);
-            %newModel.enzGeneAssoc{length(newModel.enz)} = strjoin(model.genes(genesInvolved));
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             enzName = 'E_r_0492[c11]';
@@ -156,11 +143,9 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             newModel.spontaneousRxn = [newModel.spontaneousRxn;0];
             % set rxn-enzyme association
             aux = aux + 1;
-            %assert(length(newModel.rxns)==aux+length(model.rxns))
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0492'),aux) = 1;
             newModel.enz{length(newModel.enz)+1} = enzName;
             newModel.enzLength(aux) = sum(aa);
-            %newModel.enzGeneAssoc{length(newModel.enz)} = strjoin(model.genes(genesInvolved));
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
         else
             [~, tmp_met_struct] = regexp(newModel.mets,'(?<met>.+)\[(?<comp>.+)\]|(?<met>.+)\((?<comp>.+)\)','tokens','names');
@@ -236,7 +221,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
     BaseCountsRNA(1) = BaseCountsRNA(1) + sum(aa);
 	BaseCountsRNA(3) = BaseCountsRNA(3) + 2*sum(aa);
     enzName = 'Ribosome[c03]';
-    newModel = addMetabolite(newModel,enzName,'Ribosome[c03]');
+    newModel = addMetabolite(newModel,enzName,'Ribosome');
     newModel = addReaction(newModel,{'synth_Ribosome','Production of ribosome'},...
         {%reactants: amino acids
         's_0404[c03]','s_0542[c03]','s_0432[c03]','s_0748[c03]','s_1314[c03]','s_0757[c03]','s_0832[c03]','s_0847[c03]',...
@@ -257,5 +242,4 @@ function newModel = formulateBiomassYeast(model,aaFilename)
     newModel.sizePmet = newModel.sizeQuotaMet + length(newModel.enz);
     newModel.sizePrxn = newModel.sizeQuotaRxn + nrxnNew-length(model.rxns);   
 	newModel.enzLength(end) = sum(aa);
-    %newModel.enzGeneAssoc{length(newModel.enz)} = 'Ribosome';
 end

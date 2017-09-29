@@ -332,7 +332,7 @@ function deFBAmodel = buildYeastdeFBAModel
     deFBAmodel.tf = 10;
     deFBAmodel.Y0 = [0 0 1000 0 0];
     deFBAmodel.quotaWeights = ones(deFBAmodel.sizeQuotaMet,1);
-    deFBAmodel.objectiveWeights = [zeros(deFBAmodel.noStorage,1); zeros(deFBAmodel.sizeQuotaMet,1); deFBAmodel.proteinWeights];
+    deFBAmodel.objectiveWeights = [zeros(deFBAmodel.sizeQuotaMet,1); deFBAmodel.proteinWeights];
     
     % clean up names
     for i=1:length(deFBAmodel.mets)
