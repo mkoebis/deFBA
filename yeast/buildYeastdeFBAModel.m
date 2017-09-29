@@ -237,8 +237,8 @@ function deFBAmodel = buildYeastdeFBAModel
 
     deFBAmodel = formulateBiomassYeast(deFBAmodel,'AminoAcidCountsAll.csv');
     
-    deFBAmodel.quotaInitial = [0.466298, 0.066545662, 0.003915684,...
-        0.3147174, 0.0082575747, 0.0022937964, zeros(1,length(deFBAmodel.enz))];
+    deFBAmodel.quotaInitial = [0.466298; 0.066545662; 0.003915684;...
+        0.3147174; 0.0082575747; 0.0022937964; zeros(length(deFBAmodel.enz),1)];
     % correct steady-state protein biomass to only 0.5947 (only non-metabolic proteins, since the rest are modeled explicitly)
     % number from data in http://www.ncbi.nlm.nih.gov/pubmed/18820680
     deFBAmodel.quotaInitial(1) = deFBAmodel.quotaInitial(1)*0.5947;
@@ -284,7 +284,7 @@ function deFBAmodel = buildYeastdeFBAModel
 
     % set Kcat of ribosome
     en = find(deFBAmodel.rxnEnzRules(:,end));
-    deFBAmodel.Kcat_f(en,end) = deFBAmodel.ribosomeRate*3600./(deFBAmodel.rxnEnzRules(en,end).*deFBAmodel.enzLength');
+    deFBAmodel.Kcat_f(en,end) = deFBAmodel.ribosomeRate*3600./(deFBAmodel.rxnEnzRules(en,end).*deFBAmodel.enzLength);
 
     % set kcat of glucose and galactose transporters
     transp = {'r_1166','r_1135'};

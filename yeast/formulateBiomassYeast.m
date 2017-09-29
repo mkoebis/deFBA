@@ -39,7 +39,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
 
     newModel.rxnEnzRules = sparse(nrxnNew,nenzNew);
     newModel.enz = {};
-	newModel.enzLength = zeros(1,nenzNew);
+	newModel.enzLength = zeros(nenzNew,1);
     newModel.proteinWeights = zeros(nenzNew,1);
     
     uniqueGeneAssoc = unique(geneCombs);  
@@ -77,7 +77,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             % set rxn-enzyme association
             aux = aux + 1;
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0451'),aux) = 1;
-            newModel.enz{length(newModel.enz)+1} = enzName;
+            newModel.enz{length(newModel.enz)+1,1} = enzName;
             newModel.enzLength(aux) = sum(aa);
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -99,7 +99,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             % set rxn-enzyme association
             aux = aux + 1;
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0452'),aux) = 1;
-            newModel.enz{length(newModel.enz)+1} = enzName;
+            newModel.enz{length(newModel.enz)+1,1} = enzName;
             newModel.enzLength(aux) = sum(aa);
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
         elseif ismember('r_0492',rxnsCatalysedNames)
@@ -122,7 +122,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             % set rxn-enzyme association
             aux = aux + 1;
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0491_1'),aux) = 1;
-            newModel.enz{length(newModel.enz)+1} = enzName;
+            newModel.enz{length(newModel.enz)+1,1} = enzName;
             newModel.enzLength(aux) = sum(aa);
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,7 +144,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             % set rxn-enzyme association
             aux = aux + 1;
             newModel.rxnEnzRules(findRxnIDs(newModel,'r_0492'),aux) = 1;
-            newModel.enz{length(newModel.enz)+1} = enzName;
+            newModel.enz{length(newModel.enz)+1,1} = enzName;
             newModel.enzLength(aux) = sum(aa);
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
         else
@@ -195,7 +195,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
             % set rxn-enzyme association
             aux = aux + 1;
             newModel.rxnEnzRules(rxnsCatalysed,aux) = 1;
-            newModel.enz{length(newModel.enz)+1} = enzName;
+            newModel.enz{length(newModel.enz)+1,1} = enzName;
             newModel.enzLength(aux) = sum(aa);      
             newModel.proteinWeights(aux) = sum(aaMolW.*aa);
         end        
@@ -238,7 +238,7 @@ function newModel = formulateBiomassYeast(model,aaFilename)
     newModel.rxnEnzRules(length(model.rxns)+1:end,end) = 1;
     
     newModel.proteinWeights(end) = sum(aaMolW.*aa);
-    newModel.enz{length(newModel.enz)+1} = 'Ribosome[c03]';
+    newModel.enz{length(newModel.enz)+1,1} = 'Ribosome[c03]';
     newModel.sizePmet = newModel.sizeQuotaMet + length(newModel.enz);
     newModel.sizePrxn = newModel.sizeQuotaRxn + nrxnNew-length(model.rxns);   
 	newModel.enzLength(end) = sum(aa);

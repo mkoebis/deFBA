@@ -29,8 +29,6 @@ function newModel = duplicateOrRxns(model)
                 model.S(model.S(:,idx(i))~=0,idx(i)),...
                 model.rev(idx(i))==1, mysplit{j});              
         end
-        i
-        model.rxns(idx(i))
         % remove original reaction since now we have the replacements
         newModel = removeRxns(newModel,model.rxns(idx(i)));      
     end
