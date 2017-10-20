@@ -309,7 +309,7 @@ function deFBAmodel = buildYeastdeFBAModel
 
     % set N,K,tf,epsilon,beta
     % 	deFBAmodel.tf = 3;
-    deFBAmodel.storageWeight = [180.1559,342.296]*1e-3;
+    deFBAmodel.storageWeight = [180.1559;342.296]*1e-3;
     deFBAmodel.N = 10;
     deFBAmodel.K = 1;
     deFBAmodel.epsilon = 1e-4;
