@@ -684,6 +684,7 @@ end
 %% parse metabolite id
 function [idsMet,comps,tmp_metCompartment] = parseMetID(id)
     comps = '';
+    
     [~,aux] = regexp(id,'(?<met>.+)\[(?<comp3>.+)\]_\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
      
     if isempty(aux)

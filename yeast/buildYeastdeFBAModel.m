@@ -1,5 +1,4 @@
 function deFBAmodel = buildYeastdeFBAModel
-    % 	load('yeast6.06_reduced_correctNames.mat');
     load('reducedYeast6.mat');
     
     % remove steady-state total biomass and glucose, galactose, ethanol
@@ -13,11 +12,11 @@ function deFBAmodel = buildYeastdeFBAModel
         's_0796[c06]','s_1061[c06]','s_1154[c06]','s_1277[c06]','s_1324[c06]',...
         's_1468[c06]','s_0805[c06]','s_1571[c06]','s_2766[c01]','s_2768[c01]'});
     
-%     % remove dead ends
-%     model = removeMetabolites(model,{'s_0164[c11]','s_0383[c03]','s_0685[c03]','s_0868[c07]','s_0889[c07]',...
-%         's_1096[c03]','s_1117[c07]','s_1126[c07]','s_1129[c07]','s_1132[c07]','s_1135[c07]','s_1138[c07]','s_1141[c07]','s_1144[c07]','s_1525[c09]'});
-%     % remove corresp. reactions
-%     model = removeRxns(model,{'r_1574','r_0139','r_0369','r_0580','r_0585','r_1509','r_1510','r_1511','r_1512','r_1513','r_1516','r_1517','r_2081','r_2108'});
+    % remove dead ends
+    model = removeMetabolites(model,{'s_0164[c11]','s_0383[c03]','s_0685[c03]','s_0868[c07]','s_0889[c07]',...
+        's_1096[c03]','s_1117[c07]','s_1126[c07]','s_1129[c07]','s_1132[c07]','s_1135[c07]','s_1138[c07]','s_1141[c07]','s_1144[c07]','s_1525[c09]'});
+    % remove corresp. reactions
+    model = removeRxns(model,{'r_1574','r_0139','r_0369','r_0580','r_0585','r_1509','r_1510','r_1511','r_1512','r_1513','r_1516','r_1517','r_2081','r_2108'});
 
     % remove putrescine cycling
     model = removeRxns(model,{'r_1250', 'r_1251'});
@@ -334,6 +333,11 @@ function deFBAmodel = buildYeastdeFBAModel
     deFBAmodel.quotaWeights = ones(deFBAmodel.sizeQuotaMet,1);
     deFBAmodel.objectiveWeights = [zeros(deFBAmodel.sizeQuotaMet,1); deFBAmodel.proteinWeights];
     
+    % extract ids
+    for i=1:length(deFBAmodel.mets)
+        [~,~,deFBAmodel.metCompartments{i}] = parseMetID(deFBAmodel.mets{i});
+    end
+    
     % clean up names
     for i=1:length(deFBAmodel.mets)
         deFBAmodel.mets{i} = strrep(deFBAmodel.mets{i},'_[','_');
@@ -367,5 +371,96 @@ function deFBAmodel = buildYeastdeFBAModel
     deFBAmodel = rmfield(deFBAmodel,'lb');
     deFBAmodel = rmfield(deFBAmodel,'ub');
     deFBAmodel = rmfield(deFBAmodel,'c');
+    
+    % add gene product reaction composition
+    %% gene product compositions
+    T = readtable('enzymeStoichiometry.csv','ReadVariableNames',false);
+    T = T(:,1:4);
+    T.Properties.VariableNames = {'rxns','rxnNames','geneAssoc','stoichiometry'};
+    [~,perm] = ismember(deFBAmodel.rxns(1:deFBAmodel.sizeXrxn+deFBAmodel.sizeYrxn),T.rxns(:)); % now T(perm) gives the same ordering as in model.rxns
+    T = T(perm,:);
+    
+    gprComp = cell(deFBAmodel.noRxn,1);
+    for i=1:deFBAmodel.sizeXrxn+deFBAmodel.sizeYrxn
+        if ~isempty(T.geneAssoc(i))
+            tokens = strsplit(table2array(T.geneAssoc(i)),' AND ');
+            stoich = str2num(table2array(T.stoichiometry(i)));
+            if ~isempty(stoich)
+                assert(length(tokens)==length(stoich));
+            end
+            gprComp{i}='';
+            for j=1:length(stoich)
+                if j==1 && stoich(j)~=0
+                    gprComp{i} = strcat(gprComp{i},sprintf('%d*%s',stoich(j),tokens{j}));
+                elseif stoich(j)~=0
+                    gprComp{i} = strcat(gprComp{i},sprintf(' AND %d*%s',stoich(j),tokens{j}));
+                end
+            end
+        end
+        
+    end
+    
+    for i=deFBAmodel.sizeXrxn+deFBAmodel.sizeYrxn+1:deFBAmodel.sizeXrxn+deFBAmodel.sizeYrxn+deFBAmodel.sizeQuotaRxn
+        gprComp{i} = '';
+    end
+    
+    geneAssocRib = 'YGR214W AND YLR048W AND YGL123W AND YNL178W AND YLR441C AND YML063W AND YJR145C AND YHR203C AND YJR123W AND YPL090C AND YBR181C AND YOR096W AND YNL096C AND YBL072C AND YER102W AND YPL081W AND YBR189W AND YOR293W AND YMR230W AND YDR025W AND YBR048W AND YOR369C AND YDR064W AND YCR031C AND YJL191W AND YOL040C AND YJL190C AND YLR367W AND YMR143W AND YDL083C AND YML024W AND YDR447C AND YDR450W AND YML026C AND YOL121C AND YNL302C AND YHL015W AND YKR057W AND YJL136C AND YGR118W AND YPR132W AND YER074W AND YIL069C AND YGR027C AND YLR333C AND YGL189C AND YER131W AND YKL156W AND YHR021C AND YLR167W AND YOR167C AND YLR264W AND YLR388W AND YDL061C AND YLR287C-A AND YOR182C AND YOR063W AND YBR031W AND YDR012W AND YPL131W AND YML073C AND YLR448W AND YGL076C AND YPL198W AND YHL033C AND YLL045C AND YFR031C-A AND YIL018W AND YGL147C AND YNL067W AND YLR075W AND YPL220W AND YGL135W AND YPR102C AND YGR085C AND YEL054C AND YDR418W AND YDL082W AND YMR142C AND YIL133C AND YNL069C AND YKL006W AND YHL001W AND YLR029C AND YMR121C AND YKL180W AND YJL177W AND YOL120C AND YNL301C AND YMR242C AND YOR312C AND YBR084C-A AND YBL027W AND YBR191W AND YPL079W AND YLR061W AND YFL034C-A AND YBL087C AND YER117W AND YOL127W AND YGL031C AND YGR148C AND YLR344W AND YGR034W AND YHR010W AND YDR471W AND YGL103W AND YFR032C-A AND YGL030W AND YDL075W AND YLR406C AND YBL092W AND YER056C-A AND YIL052C AND YDL191W AND YDL136W AND YPL143W AND YOR234C AND YMR194W AND YPL249C-A AND YNL162W AND YHR141C AND YLR185W AND YDR500C AND YPR043W AND YJR094W-A AND YLR325C AND YJL189W AND YIL148W AND YKR094C AND YDL184C AND YDL133C-A AND YLR340W AND YDL081C AND YDL130W AND YOL039W';
+    tokens = strsplit(geneAssocRib,' AND ');
+    idx = [findRxnIDs(deFBAmodel,'synth_BM0001'),deFBAmodel.sizeXrxn+deFBAmodel.sizeYrxn+deFBAmodel.sizeQuotaRxn+1:1:deFBAmodel.noRxn];
+    gprRib = '';
+    for j=1:length(tokens)
+        if j==1
+            gprRib = strcat(gprRib,sprintf('%d*%s',1,tokens{j}));
+        else
+            gprRib = strcat(gprRib,sprintf(' AND %d*%s',1,tokens{j}));
+        end
+    end
+    
+    for i=1:length(idx)
+        gprComp{idx(i)} = gprRib;
+    end
+    
+    deFBAmodel.gprComp = gprComp;
+    
+end
+
+function [idsMet,comps,tmp_metCompartment] = parseMetID(id)
+    comps = '';
+    
+    [~,aux] = regexp(id,'(?<met>.+)\[(?<comp3>.+)\]_\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
+     
+    if isempty(aux)
+       [~,aux] = regexp(id,'(?<met>.+)\[(?<comp2>.+)\]_\[(?<comp1>.+)\]','tokens','names');
+    else
+        comps = [aux.comp3,'_',aux.comp2,'_',aux.comp1];
+        idsMet = aux.met;
+        tmp_metCompartment = aux.comp3;
+    end
+    
+    if isempty(aux)
+        [~,aux] = regexp(id,'(?<met>.+)\[(?<comp1>.+)\]','tokens','names');
+    else
+        if isempty(comps)
+            comps = [aux.comp2,'_',aux.comp1];
+            idsMet = aux.met;
+            tmp_metCompartment = aux.comp2;
+        end
+    end   
+    
+    if isempty(aux)
+        [~,aux] = regexp(id,'(?<met>.+)\[(?<comp1>.+)\]','tokens','names');
+    else
+        if isempty(comps)
+            comps = aux.comp1;
+            idsMet = aux.met;
+            tmp_metCompartment = aux.comp1;
+        end
+    end   
+    
+    if isempty(comps)
+        comps = aux.comp1;
+        idsMet = aux.met;
+        tmp_metCompartment = aux.comp1;
+    end    
 end
 
